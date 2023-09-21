@@ -6,9 +6,13 @@
 //
 
 import UIKit
+//todo import progresshud's toast
 
 class ViewController: UIViewController {
 
+    enum InputState {
+        case login, signup, forgotPass
+    }
     //MARK: IBOutlets
     //labels
     @IBOutlet weak var loginLabel: UILabel!
@@ -30,6 +34,8 @@ class ViewController: UIViewController {
     @IBOutlet weak var loginButton: UIButton!
     @IBOutlet weak var signupButton: UIButton!
     
+    //state variable
+    var isLogin = true
 
     //MARK: View Lifecycle
     override func viewDidLoad() {
@@ -37,6 +43,7 @@ class ViewController: UIViewController {
         // Do any additional setup after loading the view.
 
         setupTextFieldDelegates()
+        backgroundTapSetup()
         setupUiForAccountState(for: true)
         NotificationCenter.default.addObserver(
             self,
@@ -52,15 +59,46 @@ class ViewController: UIViewController {
 
     //MARK: IBActions
     @IBAction func forgotPassButtonTapped(_ sender: Any) {
+        let isFilled = isInputFilledUp(for: .forgotPass)
+        if !isFilled {
+            let alert = UIAlertController(title: "Alert", message: "Email field required", preferredStyle: .alert)
+            self.present(alert, animated: true) {
+                sleep(1)
+                self.dismiss(animated: true)
+            }
+            print("Email field required")
+        }
     }
 
     @IBAction func resendMailButtonTapped(_ sender: Any) {
+        let isFilled = isInputFilledUp(for: .forgotPass)
+        if !isFilled {
+            let alert = UIAlertController(title: "Alert", message: "Email field required", preferredStyle: .alert)
+            self.present(alert, animated: true) {
+                sleep(1)
+                self.dismiss(animated: true)
+            }
+            print("Email field required")
+        }
     }
     
     @IBAction func loginButtonTapped(_ sender: Any) {
+//        let isFilled = isInputFilledUp(for: isLogin ? .login : .signup)
+//        if !isFilled {
+//            let alert = UIAlertController(title: "Alert", message: "All fields required", preferredStyle: .alert)
+//            self.present(alert, animated: true) {
+//                sleep(1)
+//                self.dismiss(animated: true)
+//            }
+//            print("All fields required")
+//            return
+//        }
+
+        goToHomeView()
     }
     
     @IBAction func signupButtonTapped(_ sender: UIButton) {
+        isLogin.toggle()
         setupUiForAccountState(for: sender.titleLabel?.text == "Login")
     }
 
@@ -70,7 +108,7 @@ class ViewController: UIViewController {
         passwordTextField.addTarget(self, action: #selector(emailUpdated), for: .editingChanged)
         repeatPasswordTextField.addTarget(self, action: #selector(emailUpdated), for: .editingChanged)
     }
-
+//8
     @objc func emailUpdated(sender: UITextField) {
 
         print("\(sender.text)")
@@ -130,6 +168,34 @@ class ViewController: UIViewController {
             }
 
         }
+    }
+
+    func backgroundTapSetup() {
+        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(viewTapped))
+        view.addGestureRecognizer(tapGesture)
+    }
+
+    @objc func viewTapped() {
+        print("view tapped")
+        view.endEditing(true)
+    }
+
+    func isInputFilledUp(for inputType: InputState) -> Bool {
+        switch inputType {
+            case .login:
+                return emailTextField.hasText && passwordTextField.hasText
+            case .signup:
+                return emailTextField.hasText && passwordTextField.hasText && repeatPasswordTextField.hasText
+            case .forgotPass:
+                return emailTextField.hasText
+        }
+    }
+
+    //Navigation
+    private func goToHomeView() {
+        let homeView = UIStoryboard(name: "Main", bundle: nil).instantiateViewController(identifier: "HomeView") as UITabBarController
+        homeView.modalPresentationStyle = .fullScreen
+        present(homeView, animated: true)
     }
 }
 
