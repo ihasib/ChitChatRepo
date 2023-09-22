@@ -7,6 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		5B6D047B2ABD2D2B00DFBEAD /* User.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B6D047A2ABD2D2B00DFBEAD /* User.swift */; };
+		5B6D047E2ABD3DB800DFBEAD /* FCollectionReference.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B6D047D2ABD3DB800DFBEAD /* FCollectionReference.swift */; };
+		5B6D04802ABD3F9100DFBEAD /* FUserListener.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B6D047F2ABD3F9100DFBEAD /* FUserListener.swift */; };
 		640999432ABA00AF00CFFCDA /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 640999422ABA00AF00CFFCDA /* AppDelegate.swift */; };
 		640999452ABA00AF00CFFCDA /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 640999442ABA00AF00CFFCDA /* SceneDelegate.swift */; };
 		640999472ABA00AF00CFFCDA /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 640999462ABA00AF00CFFCDA /* ViewController.swift */; };
@@ -20,6 +23,9 @@
 /* Begin PBXFileReference section */
 		36638EFEAE25B946F44FC47E /* Pods-ChitChat.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ChitChat.release.xcconfig"; path = "Target Support Files/Pods-ChitChat/Pods-ChitChat.release.xcconfig"; sourceTree = "<group>"; };
 		5570ADC6D678A0E296C092D5 /* Pods_ChitChat.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_ChitChat.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		5B6D047A2ABD2D2B00DFBEAD /* User.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = User.swift; sourceTree = "<group>"; };
+		5B6D047D2ABD3DB800DFBEAD /* FCollectionReference.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FCollectionReference.swift; sourceTree = "<group>"; };
+		5B6D047F2ABD3F9100DFBEAD /* FUserListener.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FUserListener.swift; sourceTree = "<group>"; };
 		6409993F2ABA00AF00CFFCDA /* ChitChat.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ChitChat.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		640999422ABA00AF00CFFCDA /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		640999442ABA00AF00CFFCDA /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -44,6 +50,23 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		5B38047A2ABC818C00236CEE /* Model */ = {
+			isa = PBXGroup;
+			children = (
+				5B6D047A2ABD2D2B00DFBEAD /* User.swift */,
+			);
+			path = Model;
+			sourceTree = "<group>";
+		};
+		5B6D047C2ABD3D8F00DFBEAD /* FirebaseHelpers */ = {
+			isa = PBXGroup;
+			children = (
+				5B6D047D2ABD3DB800DFBEAD /* FCollectionReference.swift */,
+				5B6D047F2ABD3F9100DFBEAD /* FUserListener.swift */,
+			);
+			path = FirebaseHelpers;
+			sourceTree = "<group>";
+		};
 		640999362ABA00AF00CFFCDA = {
 			isa = PBXGroup;
 			children = (
@@ -65,6 +88,8 @@
 		640999412ABA00AF00CFFCDA /* ChitChat */ = {
 			isa = PBXGroup;
 			children = (
+				5B6D047C2ABD3D8F00DFBEAD /* FirebaseHelpers */,
+				5B38047A2ABC818C00236CEE /* Model */,
 				640999422ABA00AF00CFFCDA /* AppDelegate.swift */,
 				640999442ABA00AF00CFFCDA /* SceneDelegate.swift */,
 				640999462ABA00AF00CFFCDA /* ViewController.swift */,
@@ -105,7 +130,7 @@
 				6409993B2ABA00AF00CFFCDA /* Sources */,
 				6409993C2ABA00AF00CFFCDA /* Frameworks */,
 				6409993D2ABA00AF00CFFCDA /* Resources */,
-				6BED3AC1C8C91FC86ED71E60 /* [CP] Embed Pods Frameworks */,
+				D0104F5BE96B41FEFDBC5459 /* [CP] Embed Pods Frameworks */,
 			);
 			buildRules = (
 			);
@@ -164,7 +189,7 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
-		6BED3AC1C8C91FC86ED71E60 /* [CP] Embed Pods Frameworks */ = {
+		D0104F5BE96B41FEFDBC5459 /* [CP] Embed Pods Frameworks */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -210,7 +235,10 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				5B6D047B2ABD2D2B00DFBEAD /* User.swift in Sources */,
 				640999472ABA00AF00CFFCDA /* ViewController.swift in Sources */,
+				5B6D047E2ABD3DB800DFBEAD /* FCollectionReference.swift in Sources */,
+				5B6D04802ABD3F9100DFBEAD /* FUserListener.swift in Sources */,
 				640999432ABA00AF00CFFCDA /* AppDelegate.swift in Sources */,
 				640999452ABA00AF00CFFCDA /* SceneDelegate.swift in Sources */,
 			);

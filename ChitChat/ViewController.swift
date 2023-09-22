@@ -33,6 +33,7 @@ class ViewController: UIViewController {
     //buttons
     @IBOutlet weak var loginButton: UIButton!
     @IBOutlet weak var signupButton: UIButton!
+    @IBOutlet weak var resendMailButton: UIButton!
     
     //state variable
     var isLogin = true
@@ -83,17 +84,29 @@ class ViewController: UIViewController {
     }
     
     @IBAction func loginButtonTapped(_ sender: Any) {
-//        let isFilled = isInputFilledUp(for: isLogin ? .login : .signup)
-//        if !isFilled {
-//            let alert = UIAlertController(title: "Alert", message: "All fields required", preferredStyle: .alert)
-//            self.present(alert, animated: true) {
-//                sleep(1)
-//                self.dismiss(animated: true)
-//            }
-//            print("All fields required")
-//            return
-//        }
+        let isFilled = isInputFilledUp(for: isLogin ? .login : .signup)
+        if !isFilled {
+            let alert = UIAlertController(title: "Alert", message: "All fields required", preferredStyle: .alert)
+            self.present(alert, animated: true) {
+                sleep(1)
+                self.dismiss(animated: true)
+            }
+            print("All fields required")
+            return
+        }
+        if !isLogin {//signup
+            if passwordTextField.text != repeatPasswordTextField.text {
+                let alert = UIAlertController(title: "Alert", message: "Password Missmatched", preferredStyle: .alert)
+                self.present(alert, animated: true) {
+                    sleep(1)
+                    self.dismiss(animated: true)
+                }
+                print("Password Missmatched")
+                return
+            }
+        }
 
+        registerUser()
         goToHomeView()
     }
     
@@ -108,7 +121,6 @@ class ViewController: UIViewController {
         passwordTextField.addTarget(self, action: #selector(emailUpdated), for: .editingChanged)
         repeatPasswordTextField.addTarget(self, action: #selector(emailUpdated), for: .editingChanged)
     }
-//8
     @objc func emailUpdated(sender: UITextField) {
 
         print("\(sender.text)")
@@ -146,6 +158,15 @@ class ViewController: UIViewController {
         }
     }
     
+    private func registerUser() {
+        FUserListener.shared.registerUser(email: emailTextField.text!, password: passwordTextField.text!) {error in
+            if error == nil {
+                print("Verification email sent")
+                self.resendMailButton.isHidden = false
+            }
+        }
+    }
+
     var jump = 0.0
     @objc func keyboardWillShow(_ notification: Notification) {
         if let keyboardFrame: NSValue = notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? NSValue {

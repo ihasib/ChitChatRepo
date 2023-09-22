@@ -109,7 +109,7 @@
                                     <action selector="forgotPassButtonTapped:" destination="1aM-ns-2XN" eventType="touchUpInside" id="2oL-u9-Zwx"/>
                                 </connections>
                             </button>
-                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="right" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="DH6-lQ-vGa">
+                            <button hidden="YES" opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="right" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="DH6-lQ-vGa">
                                 <rect key="frame" x="287.5" y="471.5" width="116.5" height="34.5"/>
                                 <constraints>
                                     <constraint firstAttribute="width" relation="lessThanOrEqual" constant="152" id="gdB-uX-rq7"/>
@@ -181,6 +181,7 @@
                         <outlet property="repeatPassSeparatorView" destination="e0V-Ef-04k" id="9Ze-Jd-U7Q"/>
                         <outlet property="repeatPasswordLabel" destination="3qO-Iu-eWW" id="tgb-1v-rZP"/>
                         <outlet property="repeatPasswordTextField" destination="ppU-DD-Rkn" id="ctn-Vb-B4d"/>
+                        <outlet property="resendMailButton" destination="DH6-lQ-vGa" id="DTd-Nq-l4i"/>
                         <outlet property="signupButton" destination="znY-hF-shr" id="nVh-nD-FSO"/>
                     </connections>
                 </viewController>
