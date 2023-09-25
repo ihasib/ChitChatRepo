@@ -158,12 +158,19 @@ class ViewController: UIViewController {
         }
     }
     
+    private func loginUser() {
+        FUserListener.shared
+    }
+
     private func registerUser() {
         FUserListener.shared.registerUser(email: emailTextField.text!, password: passwordTextField.text!) {error in
             if error == nil {
                 print("Verification email sent")
                 self.resendMailButton.isHidden = false
+            } else {
+                print("Registration failed due to \(error?.localizedDescription)")
             }
+
         }
     }
 

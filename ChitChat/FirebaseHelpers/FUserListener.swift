@@ -34,6 +34,19 @@ class FUserListener {
         }
     }
 
+    //MARK: LOGIN
+    func loginUser(email: String, password: String, completion: @escaping (Error?, Bool) -> Void?) {
+        Auth.auth().signIn(withEmail: email, password: password) { (authDataResult, error) in
+            if error == nil && authDataResult!.user.isEmailVerified {
+                print("Login successful")
+                completion(error,true)
+                return
+            }
+            print("Login Failed")
+            completion(error, false)
+        }
+    }
+
     func saveUserToFirestore(user: User) {
         if let jsonData = try? JSONEncoder().encode(user) {
             do {
@@ -43,5 +56,9 @@ class FUserListener {
                 print(error.localizedDescription)
             }
         }
+    }
+
+    func getUserFromFirebase(userId: String, email: String? = nil) {
+        
     }
 }
