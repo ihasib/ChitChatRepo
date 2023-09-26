@@ -35,7 +35,7 @@ using model::DocumentKeyHash;
 using model::FieldPath;
 using nanopb::SharedMessage;
 
-using Operator = FieldFilter::Operator;
+using Operator = Filter::Operator;
 
 class KeyFieldNotInFilter::Rep : public FieldFilter::Rep {
  public:
@@ -45,7 +45,7 @@ class KeyFieldNotInFilter::Rep : public FieldFilter::Rep {
   }
 
   Type type() const override {
-    return Type::kKeyFieldNotInFilter;
+    return Type::kKeyFieldInFilter;
   }
 
   bool Matches(const model::Document& doc) const override;

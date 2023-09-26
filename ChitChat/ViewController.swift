@@ -160,7 +160,7 @@ class ViewController: UIViewController {
         FUserListener.shared.loginUser(email: emailTextField.text!, password: passwordTextField.text!) { error, isEmailVerified in
             if let error = error {
                 showToast(msg: "login failed with \(error.localizedDescription)", contextVc: self)
-                return
+                return nil
             }
 
             if !isEmailVerified {
@@ -169,6 +169,7 @@ class ViewController: UIViewController {
             }
 
             print("User has logged in with email ",User.currentUser?.email)
+            return nil
         }
     }
 

@@ -47,10 +47,6 @@ class LocalStore;
 class TargetData;
 }  // namespace local
 
-namespace model {
-class AggregateField;
-}  // namespace model
-
 namespace core {
 
 class SyncEngineCallback;
@@ -100,7 +96,7 @@ class SyncEngine : public remote::RemoteStoreCallback, public QueryEventSource {
  public:
   SyncEngine(local::LocalStore* local_store,
              remote::RemoteStore* remote_store,
-             const credentials::User& initial_user,
+             const auth::User& initial_user,
              size_t max_concurrent_limbo_resolutions);
 
   // Implements `QueryEventSource`.
@@ -130,26 +126,19 @@ class SyncEngine : public remote::RemoteStoreCallback, public QueryEventSource {
    * Runs the given transaction block up to retries times and then calls
    * completion.
    *
-   * @param max_attempts The maximum number of times to try before giving up.
+   * @param retries The number of times to try before giving up.
    * @param worker_queue The queue to dispatch sync engine calls to.
    * @param update_callback The callback to call to execute the user's
    * transaction.
    * @param result_callback The callback to call when the transaction is
    * finished or failed.
    */
-  void Transaction(int max_attempts,
+  void Transaction(int retries,
                    const std::shared_ptr<util::AsyncQueue>& worker_queue,
                    core::TransactionUpdateCallback update_callback,
                    core::TransactionResultCallback result_callback);
 
-  /**
-   * Executes an aggregation query.
-   */
-  void RunAggregateQuery(const core::Query& query,
-                         const std::vector<model::AggregateField>& aggregates,
-                         api::AggregateQueryCallback&& result_callback);
-
-  void HandleCredentialChange(const credentials::User& user);
+  void HandleCredentialChange(const auth::User& user);
 
   // Implements `RemoteStoreCallback`
   void ApplyRemoteEvent(const remote::RemoteEvent& remote_event) override;
@@ -238,10 +227,8 @@ class SyncEngine : public remote::RemoteStoreCallback, public QueryEventSource {
 
   void AssertCallbackExists(absl::string_view source);
 
-  ViewSnapshot InitializeViewAndComputeSnapshot(
-      const Query& query,
-      model::TargetId target_id,
-      nanopb::ByteString resume_token);
+  ViewSnapshot InitializeViewAndComputeSnapshot(const Query& query,
+                                                model::TargetId target_id);
 
   void RemoveAndCleanupTarget(model::TargetId target_id, util::Status status);
 
@@ -291,7 +278,7 @@ class SyncEngine : public remote::RemoteStoreCallback, public QueryEventSource {
   /** The remote store for sending writes, watches, etc. to the backend. */
   remote::RemoteStore* remote_store_ = nullptr;
 
-  credentials::User current_user_;
+  auth::User current_user_;
   SyncEngineCallback* sync_engine_callback_ = nullptr;
 
   /**
@@ -301,9 +288,9 @@ class SyncEngine : public remote::RemoteStoreCallback, public QueryEventSource {
   TargetIdGenerator target_id_generator_;
 
   /** Stores user completion blocks, indexed by User and BatchId. */
-  std::unordered_map<credentials::User,
+  std::unordered_map<auth::User,
                      std::unordered_map<model::BatchId, util::StatusCallback>,
-                     credentials::HashUser>
+                     auth::HashUser>
       mutation_callbacks_;
 
   /** Stores user callbacks waiting for pending writes to be acknowledged. */

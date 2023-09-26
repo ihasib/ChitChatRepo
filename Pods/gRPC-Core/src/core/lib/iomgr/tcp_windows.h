@@ -41,11 +41,12 @@
  * Takes ownership of the handle.
  */
 grpc_endpoint* grpc_tcp_create(grpc_winsocket* socket,
-                               absl::string_view peer_string);
+                               grpc_channel_args* channel_args,
+                               const char* peer_string);
 
-grpc_error_handle grpc_tcp_prepare_socket(SOCKET sock);
+grpc_error* grpc_tcp_prepare_socket(SOCKET sock);
 
-grpc_error_handle grpc_tcp_set_non_block(SOCKET sock);
+grpc_error* grpc_tcp_set_non_block(SOCKET sock);
 
 #endif
 

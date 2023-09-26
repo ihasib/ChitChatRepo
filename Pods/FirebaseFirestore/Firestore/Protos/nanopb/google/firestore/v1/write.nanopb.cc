@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Google LLC
+ * Copyright 2021 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -92,10 +92,9 @@ const pb_field_t google_firestore_v1_DocumentRemove_fields[4] = {
     PB_LAST_FIELD
 };
 
-const pb_field_t google_firestore_v1_ExistenceFilter_fields[4] = {
+const pb_field_t google_firestore_v1_ExistenceFilter_fields[3] = {
     PB_FIELD(  1, INT32   , SINGULAR, STATIC  , FIRST, google_firestore_v1_ExistenceFilter, target_id, target_id, 0),
     PB_FIELD(  2, INT32   , SINGULAR, STATIC  , OTHER, google_firestore_v1_ExistenceFilter, count, target_id, 0),
-    PB_FIELD(  3, MESSAGE , OPTIONAL, STATIC  , OTHER, google_firestore_v1_ExistenceFilter, unchanged_names, count, &google_firestore_v1_BloomFilter_fields),
     PB_LAST_FIELD
 };
 
@@ -110,7 +109,7 @@ const pb_field_t google_firestore_v1_ExistenceFilter_fields[4] = {
  * numbers or field sizes that are larger than what can fit in 8 or 16 bit
  * field descriptors.
  */
-PB_STATIC_ASSERT((pb_membersize(google_firestore_v1_Write, update) < 65536 && pb_membersize(google_firestore_v1_Write, transform) < 65536 && pb_membersize(google_firestore_v1_Write, update_mask) < 65536 && pb_membersize(google_firestore_v1_Write, current_document) < 65536 && pb_membersize(google_firestore_v1_DocumentTransform_FieldTransform, increment) < 65536 && pb_membersize(google_firestore_v1_DocumentTransform_FieldTransform, maximum) < 65536 && pb_membersize(google_firestore_v1_DocumentTransform_FieldTransform, minimum) < 65536 && pb_membersize(google_firestore_v1_DocumentTransform_FieldTransform, append_missing_elements) < 65536 && pb_membersize(google_firestore_v1_DocumentTransform_FieldTransform, remove_all_from_array) < 65536 && pb_membersize(google_firestore_v1_WriteResult, update_time) < 65536 && pb_membersize(google_firestore_v1_DocumentChange, document) < 65536 && pb_membersize(google_firestore_v1_DocumentDelete, read_time) < 65536 && pb_membersize(google_firestore_v1_DocumentRemove, read_time) < 65536 && pb_membersize(google_firestore_v1_ExistenceFilter, unchanged_names) < 65536), YOU_MUST_DEFINE_PB_FIELD_32BIT_FOR_MESSAGES_google_firestore_v1_Write_google_firestore_v1_DocumentTransform_google_firestore_v1_DocumentTransform_FieldTransform_google_firestore_v1_WriteResult_google_firestore_v1_DocumentChange_google_firestore_v1_DocumentDelete_google_firestore_v1_DocumentRemove_google_firestore_v1_ExistenceFilter)
+PB_STATIC_ASSERT((pb_membersize(google_firestore_v1_Write, update) < 65536 && pb_membersize(google_firestore_v1_Write, transform) < 65536 && pb_membersize(google_firestore_v1_Write, update_mask) < 65536 && pb_membersize(google_firestore_v1_Write, current_document) < 65536 && pb_membersize(google_firestore_v1_DocumentTransform_FieldTransform, increment) < 65536 && pb_membersize(google_firestore_v1_DocumentTransform_FieldTransform, maximum) < 65536 && pb_membersize(google_firestore_v1_DocumentTransform_FieldTransform, minimum) < 65536 && pb_membersize(google_firestore_v1_DocumentTransform_FieldTransform, append_missing_elements) < 65536 && pb_membersize(google_firestore_v1_DocumentTransform_FieldTransform, remove_all_from_array) < 65536 && pb_membersize(google_firestore_v1_WriteResult, update_time) < 65536 && pb_membersize(google_firestore_v1_DocumentChange, document) < 65536 && pb_membersize(google_firestore_v1_DocumentDelete, read_time) < 65536 && pb_membersize(google_firestore_v1_DocumentRemove, read_time) < 65536), YOU_MUST_DEFINE_PB_FIELD_32BIT_FOR_MESSAGES_google_firestore_v1_Write_google_firestore_v1_DocumentTransform_google_firestore_v1_DocumentTransform_FieldTransform_google_firestore_v1_WriteResult_google_firestore_v1_DocumentChange_google_firestore_v1_DocumentDelete_google_firestore_v1_DocumentRemove_google_firestore_v1_ExistenceFilter)
 #endif
 
 #if !defined(PB_FIELD_16BIT) && !defined(PB_FIELD_32BIT)
@@ -121,7 +120,7 @@ PB_STATIC_ASSERT((pb_membersize(google_firestore_v1_Write, update) < 65536 && pb
  * numbers or field sizes that are larger than what can fit in the default
  * 8 bit descriptors.
  */
-PB_STATIC_ASSERT((pb_membersize(google_firestore_v1_Write, update) < 256 && pb_membersize(google_firestore_v1_Write, transform) < 256 && pb_membersize(google_firestore_v1_Write, update_mask) < 256 && pb_membersize(google_firestore_v1_Write, current_document) < 256 && pb_membersize(google_firestore_v1_DocumentTransform_FieldTransform, increment) < 256 && pb_membersize(google_firestore_v1_DocumentTransform_FieldTransform, maximum) < 256 && pb_membersize(google_firestore_v1_DocumentTransform_FieldTransform, minimum) < 256 && pb_membersize(google_firestore_v1_DocumentTransform_FieldTransform, append_missing_elements) < 256 && pb_membersize(google_firestore_v1_DocumentTransform_FieldTransform, remove_all_from_array) < 256 && pb_membersize(google_firestore_v1_WriteResult, update_time) < 256 && pb_membersize(google_firestore_v1_DocumentChange, document) < 256 && pb_membersize(google_firestore_v1_DocumentDelete, read_time) < 256 && pb_membersize(google_firestore_v1_DocumentRemove, read_time) < 256 && pb_membersize(google_firestore_v1_ExistenceFilter, unchanged_names) < 256), YOU_MUST_DEFINE_PB_FIELD_16BIT_FOR_MESSAGES_google_firestore_v1_Write_google_firestore_v1_DocumentTransform_google_firestore_v1_DocumentTransform_FieldTransform_google_firestore_v1_WriteResult_google_firestore_v1_DocumentChange_google_firestore_v1_DocumentDelete_google_firestore_v1_DocumentRemove_google_firestore_v1_ExistenceFilter)
+PB_STATIC_ASSERT((pb_membersize(google_firestore_v1_Write, update) < 256 && pb_membersize(google_firestore_v1_Write, transform) < 256 && pb_membersize(google_firestore_v1_Write, update_mask) < 256 && pb_membersize(google_firestore_v1_Write, current_document) < 256 && pb_membersize(google_firestore_v1_DocumentTransform_FieldTransform, increment) < 256 && pb_membersize(google_firestore_v1_DocumentTransform_FieldTransform, maximum) < 256 && pb_membersize(google_firestore_v1_DocumentTransform_FieldTransform, minimum) < 256 && pb_membersize(google_firestore_v1_DocumentTransform_FieldTransform, append_missing_elements) < 256 && pb_membersize(google_firestore_v1_DocumentTransform_FieldTransform, remove_all_from_array) < 256 && pb_membersize(google_firestore_v1_WriteResult, update_time) < 256 && pb_membersize(google_firestore_v1_DocumentChange, document) < 256 && pb_membersize(google_firestore_v1_DocumentDelete, read_time) < 256 && pb_membersize(google_firestore_v1_DocumentRemove, read_time) < 256), YOU_MUST_DEFINE_PB_FIELD_16BIT_FOR_MESSAGES_google_firestore_v1_Write_google_firestore_v1_DocumentTransform_google_firestore_v1_DocumentTransform_FieldTransform_google_firestore_v1_WriteResult_google_firestore_v1_DocumentChange_google_firestore_v1_DocumentDelete_google_firestore_v1_DocumentRemove_google_firestore_v1_ExistenceFilter)
 #endif
 
 
@@ -137,193 +136,179 @@ const char* EnumToString(
 }
 
 std::string google_firestore_v1_Write::ToString(int indent) const {
-    std::string tostring_header = PrintHeader(indent, "Write", this);
-    std::string tostring_result;
+    std::string header = PrintHeader(indent, "Write", this);
+    std::string result;
 
     switch (which_operation) {
     case google_firestore_v1_Write_update_tag:
-        tostring_result += PrintMessageField("update ",
-            update, indent + 1, true);
+        result += PrintMessageField("update ", update, indent + 1, true);
         break;
     case google_firestore_v1_Write_delete_tag:
-        tostring_result += PrintPrimitiveField("delete: ",
-            delete_, indent + 1, true);
+        result += PrintPrimitiveField("delete: ", delete_, indent + 1, true);
         break;
     case google_firestore_v1_Write_verify_tag:
-        tostring_result += PrintPrimitiveField("verify: ",
-            verify, indent + 1, true);
+        result += PrintPrimitiveField("verify: ", verify, indent + 1, true);
         break;
     case google_firestore_v1_Write_transform_tag:
-        tostring_result += PrintMessageField("transform ",
-            transform, indent + 1, true);
+        result += PrintMessageField("transform ", transform, indent + 1, true);
         break;
     }
     if (has_update_mask) {
-        tostring_result += PrintMessageField("update_mask ",
+        result += PrintMessageField("update_mask ",
             update_mask, indent + 1, true);
     }
     if (has_current_document) {
-        tostring_result += PrintMessageField("current_document ",
+        result += PrintMessageField("current_document ",
             current_document, indent + 1, true);
     }
     for (pb_size_t i = 0; i != update_transforms_count; ++i) {
-        tostring_result += PrintMessageField("update_transforms ",
+        result += PrintMessageField("update_transforms ",
             update_transforms[i], indent + 1, true);
     }
 
-    std::string tostring_tail = PrintTail(indent);
-    return tostring_header + tostring_result + tostring_tail;
+    std::string tail = PrintTail(indent);
+    return header + result + tail;
 }
 
 std::string google_firestore_v1_DocumentTransform::ToString(int indent) const {
-    std::string tostring_header = PrintHeader(indent, "DocumentTransform", this);
-    std::string tostring_result;
+    std::string header = PrintHeader(indent, "DocumentTransform", this);
+    std::string result;
 
-    tostring_result += PrintPrimitiveField("document: ",
-        document, indent + 1, false);
+    result += PrintPrimitiveField("document: ", document, indent + 1, false);
     for (pb_size_t i = 0; i != field_transforms_count; ++i) {
-        tostring_result += PrintMessageField("field_transforms ",
+        result += PrintMessageField("field_transforms ",
             field_transforms[i], indent + 1, true);
     }
 
     bool is_root = indent == 0;
-    if (!tostring_result.empty() || is_root) {
-      std::string tostring_tail = PrintTail(indent);
-      return tostring_header + tostring_result + tostring_tail;
+    if (!result.empty() || is_root) {
+      std::string tail = PrintTail(indent);
+      return header + result + tail;
     } else {
       return "";
     }
 }
 
 std::string google_firestore_v1_DocumentTransform_FieldTransform::ToString(int indent) const {
-    std::string tostring_header = PrintHeader(indent, "FieldTransform", this);
-    std::string tostring_result;
+    std::string header = PrintHeader(indent, "FieldTransform", this);
+    std::string result;
 
-    tostring_result += PrintPrimitiveField("field_path: ",
+    result += PrintPrimitiveField("field_path: ",
         field_path, indent + 1, false);
     switch (which_transform_type) {
     case google_firestore_v1_DocumentTransform_FieldTransform_set_to_server_value_tag:
-        tostring_result += PrintEnumField("set_to_server_value: ",
+        result += PrintEnumField("set_to_server_value: ",
             set_to_server_value, indent + 1, true);
         break;
     case google_firestore_v1_DocumentTransform_FieldTransform_increment_tag:
-        tostring_result += PrintMessageField("increment ",
-            increment, indent + 1, true);
+        result += PrintMessageField("increment ", increment, indent + 1, true);
         break;
     case google_firestore_v1_DocumentTransform_FieldTransform_maximum_tag:
-        tostring_result += PrintMessageField("maximum ",
-            maximum, indent + 1, true);
+        result += PrintMessageField("maximum ", maximum, indent + 1, true);
         break;
     case google_firestore_v1_DocumentTransform_FieldTransform_minimum_tag:
-        tostring_result += PrintMessageField("minimum ",
-            minimum, indent + 1, true);
+        result += PrintMessageField("minimum ", minimum, indent + 1, true);
         break;
     case google_firestore_v1_DocumentTransform_FieldTransform_append_missing_elements_tag:
-        tostring_result += PrintMessageField("append_missing_elements ",
+        result += PrintMessageField("append_missing_elements ",
             append_missing_elements, indent + 1, true);
         break;
     case google_firestore_v1_DocumentTransform_FieldTransform_remove_all_from_array_tag:
-        tostring_result += PrintMessageField("remove_all_from_array ",
+        result += PrintMessageField("remove_all_from_array ",
             remove_all_from_array, indent + 1, true);
         break;
     }
 
     bool is_root = indent == 0;
-    if (!tostring_result.empty() || is_root) {
-      std::string tostring_tail = PrintTail(indent);
-      return tostring_header + tostring_result + tostring_tail;
+    if (!result.empty() || is_root) {
+      std::string tail = PrintTail(indent);
+      return header + result + tail;
     } else {
       return "";
     }
 }
 
 std::string google_firestore_v1_WriteResult::ToString(int indent) const {
-    std::string tostring_header = PrintHeader(indent, "WriteResult", this);
-    std::string tostring_result;
+    std::string header = PrintHeader(indent, "WriteResult", this);
+    std::string result;
 
     if (has_update_time) {
-        tostring_result += PrintMessageField("update_time ",
+        result += PrintMessageField("update_time ",
             update_time, indent + 1, true);
     }
     for (pb_size_t i = 0; i != transform_results_count; ++i) {
-        tostring_result += PrintMessageField("transform_results ",
+        result += PrintMessageField("transform_results ",
             transform_results[i], indent + 1, true);
     }
 
-    std::string tostring_tail = PrintTail(indent);
-    return tostring_header + tostring_result + tostring_tail;
+    std::string tail = PrintTail(indent);
+    return header + result + tail;
 }
 
 std::string google_firestore_v1_DocumentChange::ToString(int indent) const {
-    std::string tostring_header = PrintHeader(indent, "DocumentChange", this);
-    std::string tostring_result;
+    std::string header = PrintHeader(indent, "DocumentChange", this);
+    std::string result;
 
-    tostring_result += PrintMessageField("document ",
-        document, indent + 1, false);
+    result += PrintMessageField("document ", document, indent + 1, false);
     for (pb_size_t i = 0; i != target_ids_count; ++i) {
-        tostring_result += PrintPrimitiveField("target_ids: ",
+        result += PrintPrimitiveField("target_ids: ",
             target_ids[i], indent + 1, true);
     }
     for (pb_size_t i = 0; i != removed_target_ids_count; ++i) {
-        tostring_result += PrintPrimitiveField("removed_target_ids: ",
+        result += PrintPrimitiveField("removed_target_ids: ",
             removed_target_ids[i], indent + 1, true);
     }
 
-    std::string tostring_tail = PrintTail(indent);
-    return tostring_header + tostring_result + tostring_tail;
+    std::string tail = PrintTail(indent);
+    return header + result + tail;
 }
 
 std::string google_firestore_v1_DocumentDelete::ToString(int indent) const {
-    std::string tostring_header = PrintHeader(indent, "DocumentDelete", this);
-    std::string tostring_result;
+    std::string header = PrintHeader(indent, "DocumentDelete", this);
+    std::string result;
 
-    tostring_result += PrintPrimitiveField("document: ",
-        document, indent + 1, false);
+    result += PrintPrimitiveField("document: ", document, indent + 1, false);
     if (has_read_time) {
-        tostring_result += PrintMessageField("read_time ",
-            read_time, indent + 1, true);
+        result += PrintMessageField("read_time ", read_time, indent + 1, true);
     }
     for (pb_size_t i = 0; i != removed_target_ids_count; ++i) {
-        tostring_result += PrintPrimitiveField("removed_target_ids: ",
+        result += PrintPrimitiveField("removed_target_ids: ",
             removed_target_ids[i], indent + 1, true);
     }
 
-    std::string tostring_tail = PrintTail(indent);
-    return tostring_header + tostring_result + tostring_tail;
+    std::string tail = PrintTail(indent);
+    return header + result + tail;
 }
 
 std::string google_firestore_v1_DocumentRemove::ToString(int indent) const {
-    std::string tostring_header = PrintHeader(indent, "DocumentRemove", this);
-    std::string tostring_result;
+    std::string header = PrintHeader(indent, "DocumentRemove", this);
+    std::string result;
 
-    tostring_result += PrintPrimitiveField("document: ",
-        document, indent + 1, false);
+    result += PrintPrimitiveField("document: ", document, indent + 1, false);
     for (pb_size_t i = 0; i != removed_target_ids_count; ++i) {
-        tostring_result += PrintPrimitiveField("removed_target_ids: ",
+        result += PrintPrimitiveField("removed_target_ids: ",
             removed_target_ids[i], indent + 1, true);
     }
-    tostring_result += PrintMessageField("read_time ",
-        read_time, indent + 1, false);
+    result += PrintMessageField("read_time ", read_time, indent + 1, false);
 
-    std::string tostring_tail = PrintTail(indent);
-    return tostring_header + tostring_result + tostring_tail;
+    std::string tail = PrintTail(indent);
+    return header + result + tail;
 }
 
 std::string google_firestore_v1_ExistenceFilter::ToString(int indent) const {
-    std::string tostring_header = PrintHeader(indent, "ExistenceFilter", this);
-    std::string tostring_result;
+    std::string header = PrintHeader(indent, "ExistenceFilter", this);
+    std::string result;
 
-    tostring_result += PrintPrimitiveField("target_id: ",
-        target_id, indent + 1, false);
-    tostring_result += PrintPrimitiveField("count: ",
-        count, indent + 1, false);
-    if (has_unchanged_names) {
-        tostring_result += PrintMessageField("unchanged_names ",
-            unchanged_names, indent + 1, true);
+    result += PrintPrimitiveField("target_id: ", target_id, indent + 1, false);
+    result += PrintPrimitiveField("count: ", count, indent + 1, false);
+
+    bool is_root = indent == 0;
+    if (!result.empty() || is_root) {
+      std::string tail = PrintTail(indent);
+      return header + result + tail;
+    } else {
+      return "";
     }
-
-    std::string tostring_tail = PrintTail(indent);
-    return tostring_header + tostring_result + tostring_tail;
 }
 
 }  // namespace firestore

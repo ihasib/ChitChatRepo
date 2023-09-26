@@ -34,7 +34,7 @@ using model::FieldPath;
 using model::IsArray;
 using nanopb::SharedMessage;
 
-using Operator = FieldFilter::Operator;
+using Operator = Filter::Operator;
 
 class ArrayContainsAnyFilter::Rep : public FieldFilter::Rep {
  public:

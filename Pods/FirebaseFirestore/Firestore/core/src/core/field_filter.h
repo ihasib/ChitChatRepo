@@ -19,7 +19,6 @@
 
 #include <memory>
 #include <string>
-#include <vector>
 
 #include "Firestore/Protos/nanopb/google/firestore/v1/document.nanopb.h"
 #include "Firestore/core/src/core/filter.h"
@@ -42,25 +41,7 @@ namespace core {
 class FieldFilter : public Filter {
  public:
   /**
-   * Operator is a value relation operator that can be used to filter documents.
-   * It is similar to NSPredicateOperatorType, but only has operators supported
-   * by Firestore.
-   */
-  enum class Operator {
-    LessThan,
-    LessThanOrEqual,
-    Equal,
-    NotEqual,
-    GreaterThanOrEqual,
-    GreaterThan,
-    ArrayContains,
-    In,
-    ArrayContainsAny,
-    NotIn,
-  };
-
-  /**
-   * Creates a FieldFilter instance for the provided path, operator, and value.
+   * Creates a Filter instance for the provided path, operator, and value.
    */
   static FieldFilter Create(
       const model::FieldPath& path,
@@ -94,8 +75,7 @@ class FieldFilter : public Filter {
 
     bool IsInequality() const override;
 
-    /** Returns the field the Filter operates over. */
-    const model::FieldPath& field() const {
+    const model::FieldPath& field() const override {
       return field_;
     }
 
@@ -113,15 +93,7 @@ class FieldFilter : public Filter {
 
     std::string ToString() const override;
 
-    bool IsEmpty() const override {
-      return false;
-    }
-
-    const model::FieldPath* GetFirstInequalityField() const override;
-
-    const std::vector<FieldFilter>& GetFlattenedFilters() const override;
-
-    std::vector<Filter> GetFilters() const override;
+    size_t Hash() const override;
 
    protected:
     /**

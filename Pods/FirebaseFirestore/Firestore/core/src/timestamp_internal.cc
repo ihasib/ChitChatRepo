@@ -20,12 +20,12 @@
 #include "Firestore/core/src/util/hashing.h"
 #include "Firestore/core/src/util/statusor.h"
 
-using firebase::firestore::util::Status;
-using firebase::firestore::util::StatusOr;
+namespace util = firebase::firestore::util;
 
 namespace firebase {
 
-StatusOr<Timestamp> TimestampInternal::FromUntrustedTime(absl::Time time) {
+util::StatusOr<Timestamp> TimestampInternal::FromUntrustedTime(
+    absl::Time time) {
   // Note `ToUnixSeconds` rounds towards negative infinity, this makes the
   // `nanos` calculated below always non-negative, meeting protobuf's
   // requirement.
@@ -35,22 +35,22 @@ StatusOr<Timestamp> TimestampInternal::FromUntrustedTime(absl::Time time) {
   return FromUntrustedSecondsAndNanos(seconds, nanos);
 }
 
-StatusOr<Timestamp> TimestampInternal::FromUntrustedSecondsAndNanos(
+util::StatusOr<Timestamp> TimestampInternal::FromUntrustedSecondsAndNanos(
     int64_t seconds, int32_t nanos) {
   // The Timestamp ctor will assert if we provide values outside the valid
   // range. However, since we're decoding, a single corrupt byte could cause
   // this to occur, so we'll verify the ranges before passing them in since we'd
   // rather not abort in these situations.
   if (seconds < Min().seconds()) {
-    return Status(
+    return util::Status(
         firestore::Error::kErrorInvalidArgument,
         "Invalid message: timestamp beyond the earliest supported date");
   } else if (Max().seconds() < seconds) {
-    return Status(
+    return util::Status(
         firestore::Error::kErrorInvalidArgument,
         "Invalid message: timestamp beyond the latest supported date");
   } else if (nanos < 0 || nanos > 999999999) {
-    return Status(
+    return util::Status(
         firestore::Error::kErrorInvalidArgument,
         "Invalid message: timestamp nanos must be between 0 and 999999999");
   }
@@ -59,8 +59,7 @@ StatusOr<Timestamp> TimestampInternal::FromUntrustedSecondsAndNanos(
 }
 
 size_t TimestampInternal::Hash(const Timestamp& timestamp) {
-  return firebase::firestore::util::Hash(timestamp.seconds(),
-                                         timestamp.nanoseconds());
+  return util::Hash(timestamp.seconds(), timestamp.nanoseconds());
 }
 
 Timestamp TimestampInternal::Truncate(const Timestamp& timestamp) {

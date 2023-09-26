@@ -17,30 +17,23 @@
  */
 
 #include <memory>
-#include <string>
-#include <utility>
-#include <vector>
 
-#include <grpc/grpc.h>
-#include <grpc/status.h>
 #include <grpcpp/channel.h>
 #include <grpcpp/create_channel.h>
 #include <grpcpp/impl/grpc_library.h>
 #include <grpcpp/security/credentials.h>
 #include <grpcpp/support/channel_arguments.h>
-#include <grpcpp/support/client_interceptor.h>
-#include <grpcpp/support/config.h>
 
 #include "src/cpp/client/create_channel_internal.h"
 
-namespace grpc {
-std::shared_ptr<grpc::Channel> CreateChannel(
+namespace grpc_impl {
+std::shared_ptr<grpc::Channel> CreateChannelImpl(
     const grpc::string& target,
     const std::shared_ptr<grpc::ChannelCredentials>& creds) {
-  return CreateCustomChannel(target, creds, grpc::ChannelArguments());
+  return CreateCustomChannelImpl(target, creds, grpc::ChannelArguments());
 }
 
-std::shared_ptr<grpc::Channel> CreateCustomChannel(
+std::shared_ptr<grpc::Channel> CreateCustomChannelImpl(
     const grpc::string& target,
     const std::shared_ptr<grpc::ChannelCredentials>& creds,
     const grpc::ChannelArguments& args) {
@@ -70,7 +63,7 @@ namespace experimental {
 /// fail) is returned.
 /// \param args Options for channel creation.
 std::shared_ptr<grpc::Channel> CreateCustomChannelWithInterceptors(
-    const std::string& target,
+    const grpc::string& target,
     const std::shared_ptr<grpc::ChannelCredentials>& creds,
     const grpc::ChannelArguments& args,
     std::vector<
@@ -89,4 +82,4 @@ std::shared_ptr<grpc::Channel> CreateCustomChannelWithInterceptors(
 }
 }  // namespace experimental
 
-}  // namespace grpc
+}  // namespace grpc_impl

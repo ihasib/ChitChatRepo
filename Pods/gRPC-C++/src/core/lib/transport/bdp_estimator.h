@@ -22,13 +22,14 @@
 #include <grpc/support/port_platform.h>
 
 #include <inttypes.h>
+#include <stdbool.h>
+#include <stdint.h>
 
-#include <grpc/impl/codegen/gpr_types.h>
 #include <grpc/support/log.h>
 #include <grpc/support/time.h>
 
 #include "src/core/lib/debug/trace.h"
-#include "src/core/lib/gprpp/time.h"
+#include "src/core/lib/iomgr/exec_ctx.h"
 
 extern grpc_core::TraceFlag grpc_bdp_estimator_trace;
 
@@ -67,13 +68,12 @@ class BdpEstimator {
     }
     GPR_ASSERT(ping_state_ == PingState::SCHEDULED);
     ping_state_ = PingState::STARTED;
+    accumulator_ = 0;
     ping_start_time_ = gpr_now(GPR_CLOCK_MONOTONIC);
   }
 
   // Completes a previously started ping, returns when to schedule the next one
-  Timestamp CompletePing();
-
-  int64_t accumulator() { return accumulator_; }
+  grpc_millis CompletePing();
 
  private:
   enum class PingState { UNSCHEDULED, SCHEDULED, STARTED };
@@ -83,7 +83,7 @@ class BdpEstimator {
   int64_t estimate_;
   // when was the current ping started?
   gpr_timespec ping_start_time_;
-  Duration inter_ping_delay_;
+  int inter_ping_delay_;
   int stable_estimate_count_;
   double bw_est_;
   const char* name_;

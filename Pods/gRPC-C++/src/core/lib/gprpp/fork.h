@@ -21,7 +21,7 @@
 
 #include <grpc/support/port_platform.h>
 
-#include <atomic>
+#include "src/core/lib/gprpp/atomic.h"
 
 /*
  * NOTE: FORKING IS NOT GENERALLY SUPPORTED, THIS IS ONLY INTENDED TO WORK
@@ -30,11 +30,17 @@
 
 namespace grpc_core {
 
+namespace internal {
+class ExecCtxState;
+class ThreadState;
+}  // namespace internal
+
 class Fork {
  public:
   typedef void (*child_postfork_func)(void);
 
   static void GlobalInit();
+  static void GlobalShutdown();
 
   // Returns true if fork suppport is enabled, false otherwise
   static bool Enabled();
@@ -42,14 +48,14 @@ class Fork {
   // Increment the count of active ExecCtxs.
   // Will block until a pending fork is complete if one is in progress.
   static void IncExecCtxCount() {
-    if (GPR_UNLIKELY(support_enabled_.load(std::memory_order_relaxed))) {
+    if (GPR_UNLIKELY(support_enabled_.Load(MemoryOrder::RELAXED))) {
       DoIncExecCtxCount();
     }
   }
 
   // Decrement the count of active ExecCtxs
   static void DecExecCtxCount() {
-    if (GPR_UNLIKELY(support_enabled_.load(std::memory_order_relaxed))) {
+    if (GPR_UNLIKELY(support_enabled_.Load(MemoryOrder::RELAXED))) {
       DoDecExecCtxCount();
     }
   }
@@ -85,7 +91,9 @@ class Fork {
   static void DoIncExecCtxCount();
   static void DoDecExecCtxCount();
 
-  static std::atomic<bool> support_enabled_;
+  static internal::ExecCtxState* exec_ctx_state_;
+  static internal::ThreadState* thread_state_;
+  static grpc_core::Atomic<bool> support_enabled_;
   static bool override_enabled_;
   static child_postfork_func reset_child_polling_engine_;
 };

@@ -19,10 +19,6 @@
 #ifndef GRPCPP_IMPL_CODEGEN_STATUS_H
 #define GRPCPP_IMPL_CODEGEN_STATUS_H
 
-// IWYU pragma: private, include <grpcpp/support/status.h>
-
-#include <grpc/impl/codegen/port_platform.h>
-
 #include <grpc/impl/codegen/status.h>
 #include <grpcpp/impl/codegen/config.h>
 #include <grpcpp/impl/codegen/status_code_enum.h>
@@ -32,7 +28,7 @@ namespace grpc {
 /// Did it work? If it didn't, why?
 ///
 /// See \a grpc::StatusCode for details on the available code and their meaning.
-class GRPC_MUST_USE_RESULT_WHEN_USE_STRICT_WARNING Status {
+class Status {
  public:
   /// Construct an OK instance.
   Status() : code_(StatusCode::OK) {
@@ -92,18 +88,14 @@ class GRPC_MUST_USE_RESULT_WHEN_USE_STRICT_WARNING Status {
 
   /// Construct an instance with associated \a code and \a error_message.
   /// It is an error to construct an OK status with non-empty \a error_message.
-  /// Note that \a message is intentionally accepted as a const reference
-  /// instead of a value (which results in a copy instead of a move) to allow
-  /// for easy transition to absl::Status in the future which accepts an
-  /// absl::string_view as a parameter.
-  Status(StatusCode code, const std::string& error_message)
+  Status(StatusCode code, const grpc::string& error_message)
       : code_(code), error_message_(error_message) {}
 
   /// Construct an instance with \a code,  \a error_message and
   /// \a error_details. It is an error to construct an OK status with non-empty
   /// \a error_message and/or \a error_details.
-  Status(StatusCode code, const std::string& error_message,
-         const std::string& error_details)
+  Status(StatusCode code, const grpc::string& error_message,
+         const grpc::string& error_details)
       : code_(code),
         error_message_(error_message),
         binary_error_details_(error_details) {}
@@ -117,10 +109,10 @@ class GRPC_MUST_USE_RESULT_WHEN_USE_STRICT_WARNING Status {
   /// Return the instance's error code.
   StatusCode error_code() const { return code_; }
   /// Return the instance's error message.
-  std::string error_message() const { return error_message_; }
+  grpc::string error_message() const { return error_message_; }
   /// Return the (binary) error details.
   // Usually it contains a serialized google.rpc.Status proto.
-  std::string error_details() const { return binary_error_details_; }
+  grpc::string error_details() const { return binary_error_details_; }
 
   /// Is the status OK?
   bool ok() const { return code_ == StatusCode::OK; }
@@ -132,8 +124,8 @@ class GRPC_MUST_USE_RESULT_WHEN_USE_STRICT_WARNING Status {
 
  private:
   StatusCode code_;
-  std::string error_message_;
-  std::string binary_error_details_;
+  grpc::string error_message_;
+  grpc::string binary_error_details_;
 };
 
 }  // namespace grpc

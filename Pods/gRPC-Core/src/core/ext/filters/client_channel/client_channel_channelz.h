@@ -21,24 +21,17 @@
 
 #include <grpc/support/port_platform.h>
 
-#include <stddef.h>
-
-#include <atomic>
 #include <string>
-#include <utility>
 
-#include "absl/base/thread_annotations.h"
-
-#include <grpc/impl/codegen/connectivity_state.h>
-#include <grpc/slice.h>
-
+#include "src/core/lib/channel/channel_args.h"
+#include "src/core/lib/channel/channel_stack.h"
 #include "src/core/lib/channel/channel_trace.h"
 #include "src/core/lib/channel/channelz.h"
-#include "src/core/lib/gprpp/ref_counted_ptr.h"
-#include "src/core/lib/gprpp/sync.h"
-#include "src/core/lib/json/json.h"
 
 namespace grpc_core {
+
+class Subchannel;
+
 namespace channelz {
 
 class SubchannelNode : public BaseNode {
@@ -71,9 +64,9 @@ class SubchannelNode : public BaseNode {
   void RecordCallSucceeded() { call_counter_.RecordCallSucceeded(); }
 
  private:
-  std::atomic<grpc_connectivity_state> connectivity_state_{GRPC_CHANNEL_IDLE};
+  Atomic<grpc_connectivity_state> connectivity_state_{GRPC_CHANNEL_IDLE};
   Mutex socket_mu_;
-  RefCountedPtr<SocketNode> child_socket_ ABSL_GUARDED_BY(socket_mu_);
+  RefCountedPtr<SocketNode> child_socket_;
   std::string target_;
   CallCountingHelper call_counter_;
   ChannelTrace trace_;

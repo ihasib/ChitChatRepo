@@ -16,27 +16,24 @@
  *
  */
 
-#include <memory>
-#include <string>
-#include <vector>
-
-#include <grpc/impl/codegen/grpc_types.h>
 #include <grpcpp/support/channel_arguments.h>
-#include <grpcpp/support/config.h>
 
-namespace grpc {
+#include <grpc/grpc_security.h>
+#include "src/core/lib/channel/channel_args.h"
 
-void ChannelArguments::SetSslTargetNameOverride(const std::string& name) {
+namespace grpc_impl {
+
+void ChannelArguments::SetSslTargetNameOverride(const grpc::string& name) {
   SetString(GRPC_SSL_TARGET_NAME_OVERRIDE_ARG, name);
 }
 
-std::string ChannelArguments::GetSslTargetNameOverride() const {
+grpc::string ChannelArguments::GetSslTargetNameOverride() const {
   for (unsigned int i = 0; i < args_.size(); i++) {
-    if (std::string(GRPC_SSL_TARGET_NAME_OVERRIDE_ARG) == args_[i].key) {
+    if (grpc::string(GRPC_SSL_TARGET_NAME_OVERRIDE_ARG) == args_[i].key) {
       return args_[i].value.string;
     }
   }
   return "";
 }
 
-}  // namespace grpc
+}  // namespace grpc_impl

@@ -21,6 +21,8 @@
 
 #include <grpc/support/port_platform.h>
 
+#include <stdint.h>
+
 // --------------------------------------------------------------------
 // How to use global configuration variables:
 //
@@ -87,7 +89,8 @@
 //   bool gpr_global_config_get_test();
 //   void gpr_global_config_set_test(bool value);
 
-#include "src/core/lib/gprpp/global_config_custom.h"  // IWYU pragma: export
-#include "src/core/lib/gprpp/global_config_env.h"     // IWYU pragma: export
+#include "src/core/lib/gprpp/global_config_env.h"
+
+#include "src/core/lib/gprpp/global_config_custom.h"
 
 #endif /* GRPC_CORE_LIB_GPRPP_GLOBAL_CONFIG_H */

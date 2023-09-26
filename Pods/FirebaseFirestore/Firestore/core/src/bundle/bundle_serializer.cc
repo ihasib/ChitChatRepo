@@ -7,7 +7,7 @@
  *
  *      http://www.apache.org/licenses/LICENSE-2.0
  *
- * Unless required by applicable law or agreed to in writing, software
+ * Unless Requiredd by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
@@ -34,7 +34,6 @@
 #include "Firestore/core/src/nanopb/message.h"
 #include "Firestore/core/src/nanopb/nanopb_util.h"
 #include "Firestore/core/src/timestamp_internal.h"
-#include "Firestore/core/src/util/no_destructor.h"
 #include "Firestore/core/src/util/statusor.h"
 #include "Firestore/core/src/util/string_format.h"
 #include "Firestore/core/src/util/string_util.h"
@@ -45,17 +44,18 @@
 namespace firebase {
 namespace firestore {
 namespace bundle {
+namespace {
 
 using absl::Time;
 using core::Bound;
 using core::Direction;
 using core::FieldFilter;
 using core::Filter;
+using core::FilterList;
 using core::LimitType;
 using core::OrderBy;
-using core::Query;
+using core::OrderByList;
 using core::Target;
-using model::DeepClone;
 using model::Document;
 using model::DocumentKey;
 using model::FieldPath;
@@ -71,16 +71,14 @@ using nanopb::Message;
 using nanopb::SetRepeatedField;
 using nanopb::SharedMessage;
 using nlohmann::json;
-using util::JsonReader;
-using util::NoDestructor;
 using util::StatusOr;
 using util::StringFormat;
-using Operator = FieldFilter::Operator;
 
-namespace {
-
-const NoDestructor<Bound> kDefaultBound{Bound::FromValue(
-    MakeSharedMessage<google_firestore_v1_ArrayValue>({}), false)};
+template <typename T>
+const std::vector<T>& EmptyVector() {
+  static auto* empty = new std::vector<T>;
+  return *empty;
+}
 
 Timestamp DecodeTimestamp(JsonReader& reader, const json& version) {
   StatusOr<Timestamp> decoded;
@@ -97,8 +95,8 @@ Timestamp DecodeTimestamp(JsonReader& reader, const json& version) {
     }
   } else {
     decoded = TimestampInternal::FromUntrustedSecondsAndNanos(
-        reader.OptionalInt<int64_t>("seconds", version, 0),
-        reader.OptionalInt<int32_t>("nanos", version, 0));
+        reader.RequiredInt<int64_t>("seconds", version),
+        reader.RequiredInt<int32_t>("nanos", version));
   }
 
   if (!decoded.ok()) {
@@ -181,31 +179,32 @@ FieldPath DecodeFieldReference(JsonReader& reader, const json& field) {
   }
 }
 
-Operator DecodeFieldFilterOperator(JsonReader& reader, const std::string& op) {
+Filter::Operator DecodeFieldFilterOperator(JsonReader& reader,
+                                           const std::string& op) {
   if (op == "LESS_THAN") {
-    return Operator::LessThan;
+    return Filter::Operator::LessThan;
   } else if (op == "LESS_THAN_OR_EQUAL") {
-    return Operator::LessThanOrEqual;
+    return Filter::Operator::LessThanOrEqual;
   } else if (op == "EQUAL") {
-    return Operator::Equal;
+    return Filter::Operator::Equal;
   } else if (op == "NOT_EQUAL") {
-    return Operator::NotEqual;
+    return Filter::Operator::NotEqual;
   } else if (op == "GREATER_THAN") {
-    return Operator::GreaterThan;
+    return Filter::Operator::GreaterThan;
   } else if (op == "GREATER_THAN_OR_EQUAL") {
-    return Operator::GreaterThanOrEqual;
+    return Filter::Operator::GreaterThanOrEqual;
   } else if (op == "ARRAY_CONTAINS") {
-    return Operator::ArrayContains;
+    return Filter::Operator::ArrayContains;
   } else if (op == "IN") {
-    return Operator::In;
+    return Filter::Operator::In;
   } else if (op == "ARRAY_CONTAINS_ANY") {
-    return Operator::ArrayContainsAny;
+    return Filter::Operator::ArrayContainsAny;
   } else if (op == "NOT_IN") {
-    return Operator::NotIn;
+    return Filter::Operator::NotIn;
   } else {
     reader.Fail("Operator in filter is not valid: " + op);
     // We have to return something.
-    return Operator::Equal;
+    return Filter::Operator::Equal;
   }
 }
 
@@ -228,22 +227,21 @@ Filter DecodeUnaryFilter(JsonReader& reader, const json& filter) {
   }
 
   if (op == "IS_NAN") {
-    return FieldFilter::Create(path, Operator::Equal, DeepClone(NaNValue()));
+    return FieldFilter::Create(path, Filter::Operator::Equal, NaNValue());
   } else if (op == "IS_NULL") {
-    return FieldFilter::Create(path, Operator::Equal, DeepClone(NullValue()));
+    return FieldFilter::Create(path, Filter::Operator::Equal, NullValue());
   } else if (op == "IS_NOT_NAN") {
-    return FieldFilter::Create(path, Operator::NotEqual, DeepClone(NaNValue()));
+    return FieldFilter::Create(path, Filter::Operator::NotEqual, NaNValue());
   } else if (op == "IS_NOT_NULL") {
-    return FieldFilter::Create(path, Operator::NotEqual,
-                               DeepClone(NullValue()));
+    return FieldFilter::Create(path, Filter::Operator::NotEqual, NullValue());
   }
 
   reader.Fail("Unexpected unary filter operator: " + op);
   return InvalidFilter();
 }
 
-std::vector<OrderBy> DecodeOrderBy(JsonReader& reader, const json& query) {
-  std::vector<OrderBy> result;
+OrderByList DecodeOrderBy(JsonReader& reader, const json& query) {
+  OrderByList result;
   std::vector<json> default_order_by;
   for (const auto& order_by :
        reader.OptionalArray("orderBy", query, default_order_by)) {
@@ -261,7 +259,7 @@ std::vector<OrderBy> DecodeOrderBy(JsonReader& reader, const json& query) {
                               ? Direction::Ascending
                               : Direction::Descending;
 
-    result.emplace_back(std::move(path), direction);
+    result = result.push_back(OrderBy(std::move(path), direction));
   }
 
   return result;
@@ -319,6 +317,170 @@ pb_bytes_array_t* DecodeBytesValue(JsonReader& reader,
 
 }  // namespace
 
+// Mark: JsonReader
+
+const std::string& JsonReader::RequiredString(const char* name,
+                                              const json& json_object) {
+  if (json_object.contains(name)) {
+    const json& child = json_object.at(name);
+    if (child.is_string()) {
+      return child.get_ref<const std::string&>();
+    }
+  }
+
+  Fail("'%s' is missing or is not a string", name);
+  return util::EmptyString();
+}
+
+const std::string& JsonReader::OptionalString(
+    const char* name,
+    const json& json_object,
+    const std::string& default_value) {
+  if (json_object.contains(name)) {
+    const json& child = json_object.at(name);
+    if (child.is_string()) {
+      return child.get_ref<const std::string&>();
+    }
+  }
+
+  return default_value;
+}
+
+const std::vector<json>& JsonReader::RequiredArray(const char* name,
+                                                   const json& json_object) {
+  if (json_object.contains(name)) {
+    const json& child = json_object.at(name);
+    if (child.is_array()) {
+      return child.get_ref<const std::vector<json>&>();
+    }
+  }
+
+  Fail("'%s' is missing or is not an array", name);
+  return EmptyVector<json>();
+}
+
+const std::vector<json>& JsonReader::OptionalArray(
+    const char* name,
+    const json& json_object,
+    const std::vector<json>& default_value) {
+  if (!json_object.contains(name)) {
+    return default_value;
+  }
+
+  const json& child = json_object.at(name);
+  if (child.is_array()) {
+    return child.get_ref<const std::vector<json>&>();
+  } else {
+    Fail("'%s' is not an array", name);
+    return EmptyVector<json>();
+  }
+}
+
+bool JsonReader::OptionalBool(const char* name,
+                              const json& json_object,
+                              bool default_value) {
+  return (json_object.contains(name) && json_object.at(name).is_boolean() &&
+          json_object.at(name).get<bool>()) ||
+         default_value;
+}
+
+const nlohmann::json& JsonReader::RequiredObject(const char* child_name,
+                                                 const json& json_object) {
+  if (!json_object.contains(child_name)) {
+    Fail("Missing child '%s'", child_name);
+    return json_object;
+  }
+  return json_object.at(child_name);
+}
+
+double JsonReader::RequiredDouble(const char* name, const json& json_object) {
+  if (json_object.contains(name)) {
+    double result = DecodeDouble(json_object.at(name));
+    if (ok()) {
+      return result;
+    }
+  }
+
+  Fail("'%s' is missing or is not a double", name);
+  return 0.0;
+}
+
+double JsonReader::OptionalDouble(const char* name,
+                                  const json& json_object,
+                                  double default_value) {
+  if (json_object.contains(name)) {
+    double result = DecodeDouble(json_object.at(name));
+    if (ok()) {
+      return result;
+    }
+  }
+
+  return default_value;
+}
+
+double JsonReader::DecodeDouble(const nlohmann::json& value) {
+  if (value.is_number()) {
+    return value.get<double>();
+  }
+
+  double result = 0;
+  if (value.is_string()) {
+    const auto& s = value.get_ref<const std::string&>();
+    auto ok = absl::SimpleAtod(s, &result);
+    if (!ok) {
+      Fail("Failed to parse into double: " + s);
+    }
+  }
+  return result;
+}
+
+template <typename IntType>
+IntType ParseInt(const json& value, JsonReader& reader) {
+  if (value.is_number_integer()) {
+    return value.get<IntType>();
+  }
+
+  IntType result = 0;
+  if (value.is_string()) {
+    const auto& s = value.get_ref<const std::string&>();
+    auto ok = absl::SimpleAtoi<IntType>(s, &result);
+    if (!ok) {
+      reader.Fail("Failed to parse into integer: " + s);
+      return 0;
+    }
+
+    return result;
+  }
+
+  reader.Fail("Only integer and string can be parsed into int type");
+  return 0;
+}
+
+template <typename IntType>
+IntType JsonReader::RequiredInt(const char* name, const json& json_object) {
+  if (!json_object.contains(name)) {
+    Fail("'%s' is missing or is not a double", name);
+    return 0;
+  }
+
+  const json& value = json_object.at(name);
+  return ParseInt<IntType>(value, *this);
+}
+
+template <typename IntType>
+IntType JsonReader::OptionalInt(const char* name,
+                                const json& json_object,
+                                IntType default_value) {
+  if (!json_object.contains(name)) {
+    return default_value;
+  }
+
+  const json& value = json_object.at(name);
+  return ParseInt<IntType>(value, *this);
+}
+
+// Mark: BundleSerializer
+
 BundleMetadata BundleSerializer::DecodeBundleMetadata(
     JsonReader& reader, const json& metadata) const {
   return BundleMetadata(
@@ -362,13 +524,13 @@ BundledQuery BundleSerializer::DecodeBundledQuery(
   auto filters = DecodeWhere(reader, structured_query);
   auto order_bys = DecodeOrderBy(reader, structured_query);
 
-  auto start_at_bound = DecodeStartAtBound(reader, structured_query);
+  auto start_at_bound = DecodeBound(reader, structured_query, "startAt");
   absl::optional<Bound> start_at;
   if (start_at_bound.position()->values_count > 0) {
     start_at = std::move(start_at_bound);
   }
 
-  auto end_at_bound = DecodeEndAtBound(reader, structured_query);
+  auto end_at_bound = DecodeBound(reader, structured_query, "endAt");
   absl::optional<Bound> end_at;
   if (end_at_bound.position()->values_count > 0) {
     end_at = std::move(end_at_bound);
@@ -377,19 +539,10 @@ BundledQuery BundleSerializer::DecodeBundledQuery(
   int32_t limit = DecodeLimit(reader, structured_query);
   LimitType limit_type = DecodeLimitType(reader, query);
 
-  if (!reader.ok()) {
-    return {};
-  }
-
-  return BundledQuery(
-      Query(std::move(parent), std::move(collection_group), std::move(filters),
-            std::move(order_bys), limit,
-            // Not using `limit_type` because bundled queries are what the
-            // backend sees, and there is no limit_to_last for the backend.
-            // Limit type is applied when the query is read back instead.
-            LimitType::None, std::move(start_at), std::move(end_at))
-          .ToTarget(),
-      limit_type);
+  return BundledQuery(Target(std::move(parent), std::move(collection_group),
+                             std::move(filters), std::move(order_bys), limit,
+                             std::move(start_at), std::move(end_at)),
+                      limit_type);
 }
 
 ResourcePath BundleSerializer::DecodeName(JsonReader& reader,
@@ -408,8 +561,8 @@ ResourcePath BundleSerializer::DecodeName(JsonReader& reader,
   return path.PopFirst(5);
 }
 
-std::vector<Filter> BundleSerializer::DecodeWhere(JsonReader& reader,
-                                                  const json& query) const {
+FilterList BundleSerializer::DecodeWhere(JsonReader& reader,
+                                         const json& query) const {
   // Absent 'where' is a valid case.
   if (!query.contains("where")) {
     return {};
@@ -421,12 +574,13 @@ std::vector<Filter> BundleSerializer::DecodeWhere(JsonReader& reader,
     return {};
   }
 
+  FilterList result;
   if (where.contains("compositeFilter")) {
     return DecodeCompositeFilter(reader, where.at("compositeFilter"));
   } else if (where.contains("fieldFilter")) {
-    return {DecodeFieldFilter(reader, where.at("fieldFilter"))};
+    return result.push_back(DecodeFieldFilter(reader, where.at("fieldFilter")));
   } else if (where.contains("unaryFilter")) {
-    return {DecodeUnaryFilter(reader, where.at("unaryFilter"))};
+    return result.push_back(DecodeUnaryFilter(reader, where.at("unaryFilter")));
   } else {
     reader.Fail("'where' does not have valid filter");
     return {};
@@ -453,29 +607,18 @@ Filter BundleSerializer::DecodeFieldFilter(JsonReader& reader,
   return FieldFilter::Create(path, op, std::move(value));
 }
 
-std::vector<Filter> BundleSerializer::DecodeCompositeFilter(
-    JsonReader& reader, const json& filter) const {
+FilterList BundleSerializer::DecodeCompositeFilter(JsonReader& reader,
+                                                   const json& filter) const {
   if (reader.RequiredString("op", filter) != "AND") {
     reader.Fail("The SDK only supports composite filters of type 'AND'");
     return {};
   }
 
-  const std::vector<json> default_filters;
-  const auto& filters =
-      reader.OptionalArray("filters", filter, default_filters);
-
-  const json default_objects;
-  std::vector<Filter> result;
+  auto filters = reader.RequiredArray("filters", filter);
+  FilterList result;
   for (const auto& f : filters) {
-    const json& field_filter =
-        reader.OptionalObject("fieldFilter", f, default_objects);
-    if (!field_filter.empty()) {
-      result.push_back(DecodeFieldFilter(reader, field_filter));
-    } else {
-      result.push_back(DecodeUnaryFilter(
-          reader, reader.OptionalObject("unaryFilter", f, default_objects)));
-    }
-
+    result = result.push_back(
+        DecodeFieldFilter(reader, reader.RequiredObject("fieldFilter", f)));
     if (!reader.ok()) {
       return {};
     }
@@ -484,42 +627,24 @@ std::vector<Filter> BundleSerializer::DecodeCompositeFilter(
   return result;
 }
 
-Bound BundleSerializer::DecodeStartAtBound(JsonReader& reader,
-                                           const json& query) const {
-  if (!query.contains("startAt")) {
-    return *kDefaultBound;
+Bound BundleSerializer::DecodeBound(JsonReader& reader,
+                                    const json& query,
+                                    const char* bound_name) const {
+  Bound default_bound = Bound::FromValue(
+      MakeSharedMessage<google_firestore_v1_ArrayValue>({}), false);
+  if (!query.contains(bound_name)) {
+    return default_bound;
   }
 
-  auto result =
-      DecodeBoundFields(reader, reader.RequiredObject("startAt", query));
-  return Bound::FromValue(std::move(result.second), result.first);
-}
-
-Bound BundleSerializer::DecodeEndAtBound(JsonReader& reader,
-                                         const json& query) const {
-  if (!query.contains("endAt")) {
-    return *kDefaultBound;
-  }
-
-  auto result =
-      DecodeBoundFields(reader, reader.RequiredObject("endAt", query));
-  return Bound::FromValue(std::move(result.second), !result.first);
-}
-
-std::pair<bool, nanopb::SharedMessage<google_firestore_v1_ArrayValue>>
-BundleSerializer::DecodeBoundFields(JsonReader& reader,
-                                    const nlohmann::json& bound_json) const {
+  const json& bound_json = reader.RequiredObject(bound_name, query);
+  std::vector<json> values = reader.RequiredArray("values", bound_json);
   bool before = reader.OptionalBool("before", bound_json);
 
-  std::vector<json> default_values;
-  std::vector<json> values =
-      reader.OptionalArray("values", bound_json, default_values);
   auto positions = MakeSharedMessage<google_firestore_v1_ArrayValue>({});
   SetRepeatedField(
       &positions->values, &positions->values_count, values,
       [&](const json& j) { return *DecodeValue(reader, j).release(); });
-
-  return {before, std::move(positions)};
+  return Bound::FromValue(std::move(positions), before);
 }
 
 Message<google_firestore_v1_Value> BundleSerializer::DecodeValue(
@@ -612,9 +737,7 @@ Message<google_firestore_v1_MapValue> BundleSerializer::DecodeMapValue(
 
 Message<google_firestore_v1_ArrayValue> BundleSerializer::DecodeArrayValue(
     JsonReader& reader, const json& array_json) const {
-  std::vector<json> default_values;
-  const auto& values =
-      reader.OptionalArray("values", array_json, default_values);
+  const auto& values = reader.RequiredArray("values", array_json);
 
   Message<google_firestore_v1_ArrayValue> array_value;
   SetRepeatedField(

@@ -1,17 +1,3 @@
-// Copyright 2020 The Abseil Authors.
-//
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//      https://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-
 #ifndef ABSL_STRINGS_INTERNAL_STR_FORMAT_BIND_H_
 #define ABSL_STRINGS_INTERNAL_STR_FORMAT_BIND_H_
 
@@ -25,7 +11,6 @@
 #include "absl/strings/internal/str_format/checker.h"
 #include "absl/strings/internal/str_format/parser.h"
 #include "absl/types/span.h"
-#include "absl/utility/utility.h"
 
 namespace absl {
 ABSL_NAMESPACE_BEGIN
@@ -34,7 +19,7 @@ class UntypedFormatSpec;
 
 namespace str_format_internal {
 
-class BoundConversion : public FormatConversionSpecImpl {
+class BoundConversion : public ConversionSpec {
  public:
   const FormatArgImpl* arg() const { return arg_; }
   void set_arg(const FormatArgImpl* a) { arg_ = a; }
@@ -75,7 +60,7 @@ class UntypedFormatSpecImpl {
   size_t size_;
 };
 
-template <typename T, FormatConversionCharSet...>
+template <typename T, typename...>
 struct MakeDependent {
   using type = T;
 };
@@ -83,55 +68,25 @@ struct MakeDependent {
 // Implicitly convertible from `const char*`, `string_view`, and the
 // `ExtendedParsedFormat` type. This abstraction allows all format functions to
 // operate on any without providing too many overloads.
-template <FormatConversionCharSet... Args>
+template <typename... Args>
 class FormatSpecTemplate
     : public MakeDependent<UntypedFormatSpec, Args...>::type {
   using Base = typename MakeDependent<UntypedFormatSpec, Args...>::type;
 
-  template <bool res>
-  struct ErrorMaker {
-    constexpr bool operator()(int) const { return res; }
-  };
-
-  template <int i, int j>
-  static constexpr bool CheckArity(ErrorMaker<true> SpecifierCount = {},
-                                   ErrorMaker<i == j> ParametersPassed = {}) {
-    static_assert(SpecifierCount(i) == ParametersPassed(j),
-                  "Number of arguments passed must match the number of "
-                  "conversion specifiers.");
-    return true;
-  }
-
-  template <FormatConversionCharSet specified, FormatConversionCharSet passed,
-            int arg>
-  static constexpr bool CheckMatch(
-      ErrorMaker<Contains(specified, passed)> MismatchedArgumentNumber = {}) {
-    static_assert(MismatchedArgumentNumber(arg),
-                  "Passed argument must match specified format.");
-    return true;
-  }
-
-  template <FormatConversionCharSet... C, size_t... I>
-  static bool CheckMatches(absl::index_sequence<I...>) {
-    bool res[] = {true, CheckMatch<Args, C, I + 1>()...};
-    (void)res;
-    return true;
-  }
-
  public:
 #ifdef ABSL_INTERNAL_ENABLE_FORMAT_CHECKER
 
-  // Honeypot overload for when the string is not constexpr.
+  // Honeypot overload for when the std::string is not constexpr.
   // We use the 'unavailable' attribute to give a better compiler error than
   // just 'method is deleted'.
   FormatSpecTemplate(...)  // NOLINT
-      __attribute__((unavailable("Format string is not constexpr.")));
+      __attribute__((unavailable("Format std::string is not constexpr.")));
 
   // Honeypot overload for when the format is constexpr and invalid.
   // We use the 'unavailable' attribute to give a better compiler error than
   // just 'method is deleted'.
   // To avoid checking the format twice, we just check that the format is
-  // constexpr. If it is valid, then the overload below will kick in.
+  // constexpr. If is it valid, then the overload below will kick in.
   // We add the template here to make this overload have lower priority.
   template <typename = void>
   FormatSpecTemplate(const char* s)  // NOLINT
@@ -143,19 +98,20 @@ class FormatSpecTemplate
   template <typename T = void>
   FormatSpecTemplate(string_view s)  // NOLINT
       __attribute__((enable_if(str_format_internal::EnsureConstexpr(s),
-                               "constexpr trap")))
-      : Base("to avoid noise in the compiler error") {
+                               "constexpr trap"))) {
     static_assert(sizeof(T*) == 0,
                   "Format specified does not match the arguments passed.");
   }
 
   // Good format overload.
   FormatSpecTemplate(const char* s)  // NOLINT
-      __attribute__((enable_if(ValidFormatImpl<Args...>(s), "bad format trap")))
+      __attribute__((enable_if(ValidFormatImpl<ArgumentToConv<Args>()...>(s),
+                               "bad format trap")))
       : Base(s) {}
 
   FormatSpecTemplate(string_view s)  // NOLINT
-      __attribute__((enable_if(ValidFormatImpl<Args...>(s), "bad format trap")))
+      __attribute__((enable_if(ValidFormatImpl<ArgumentToConv<Args>()...>(s),
+                               "bad format trap")))
       : Base(s) {}
 
 #else  // ABSL_INTERNAL_ENABLE_FORMAT_CHECKER
@@ -165,12 +121,17 @@ class FormatSpecTemplate
 
 #endif  // ABSL_INTERNAL_ENABLE_FORMAT_CHECKER
 
-  template <FormatConversionCharSet... C>
+  template <Conv... C, typename = typename std::enable_if<
+                           AllOf(sizeof...(C) == sizeof...(Args),
+                             Contains(ArgumentToConv<Args>(),
+                                          C)...)>::type>
   FormatSpecTemplate(const ExtendedParsedFormat<C...>& pc)  // NOLINT
-      : Base(&pc) {
-    CheckArity<sizeof...(C), sizeof...(Args)>();
-    CheckMatches<C...>(absl::make_index_sequence<sizeof...(C)>{});
-  }
+      : Base(&pc) {}
+};
+
+template <typename... Args>
+struct FormatSpecDeductionBarrier {
+  using type = FormatSpecTemplate<Args...>;
 };
 
 class Streamable {
@@ -235,9 +196,9 @@ class StreamedWrapper {
 
  private:
   template <typename S>
-  friend ArgConvertResult<FormatConversionCharSetInternal::s> FormatConvertImpl(
-      const StreamedWrapper<S>& v, FormatConversionSpecImpl conv,
-      FormatSinkImpl* out);
+  friend ConvertResult<Conv::s> FormatConvertImpl(const StreamedWrapper<S>& v,
+                                                  ConversionSpec conv,
+                                                  FormatSinkImpl* out);
   const T& v_;
 };
 

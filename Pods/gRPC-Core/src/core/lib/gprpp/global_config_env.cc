@@ -20,21 +20,15 @@
 
 #include "src/core/lib/gprpp/global_config_env.h"
 
-#include <ctype.h>
-#include <stdlib.h>
-
-#include <memory>
-#include <string>
-#include <type_traits>
-
-#include "absl/strings/str_format.h"
-#include "absl/types/optional.h"
-
+#include <grpc/support/alloc.h>
 #include <grpc/support/log.h>
 #include <grpc/support/string_util.h>
 
+#include "src/core/lib/gpr/env.h"
 #include "src/core/lib/gpr/string.h"
-#include "src/core/lib/gprpp/env.h"
+
+#include <ctype.h>
+#include <string.h>
 
 namespace grpc_core {
 
@@ -48,10 +42,12 @@ GlobalConfigEnvErrorFunctionType g_global_config_env_error_func =
     DefaultGlobalConfigEnvErrorFunction;
 
 void LogParsingError(const char* name, const char* value) {
-  std::string error_message = absl::StrFormat(
-      "Illegal value '%s' specified for environment variable '%s'", value,
-      name);
-  (*g_global_config_env_error_func)(error_message.c_str());
+  char* error_message;
+  gpr_asprintf(&error_message,
+               "Illegal value '%s' specified for environment variable '%s'",
+               value, name);
+  (*g_global_config_env_error_func)(error_message);
+  gpr_free(error_message);
 }
 
 }  // namespace
@@ -60,15 +56,15 @@ void SetGlobalConfigEnvErrorFunction(GlobalConfigEnvErrorFunctionType func) {
   g_global_config_env_error_func = func;
 }
 
-UniquePtr<char> GlobalConfigEnv::GetValue() {
-  auto env = GetEnv(GetName());
-  return UniquePtr<char>(env.has_value() ? gpr_strdup(env.value().c_str())
-                                         : nullptr);
+grpc_core::UniquePtr<char> GlobalConfigEnv::GetValue() {
+  return grpc_core::UniquePtr<char>(gpr_getenv(GetName()));
 }
 
-void GlobalConfigEnv::SetValue(const char* value) { SetEnv(GetName(), value); }
+void GlobalConfigEnv::SetValue(const char* value) {
+  gpr_setenv(GetName(), value);
+}
 
-void GlobalConfigEnv::Unset() { UnsetEnv(GetName()); }
+void GlobalConfigEnv::Unset() { gpr_unsetenv(GetName()); }
 
 char* GlobalConfigEnv::GetName() {
   // This makes sure that name_ is in a canonical form having uppercase
@@ -82,7 +78,7 @@ static_assert(std::is_trivially_destructible<GlobalConfigEnvBool>::value,
               "GlobalConfigEnvBool needs to be trivially destructible.");
 
 bool GlobalConfigEnvBool::Get() {
-  UniquePtr<char> str = GetValue();
+  grpc_core::UniquePtr<char> str = GetValue();
   if (str == nullptr) {
     return default_value_;
   }
@@ -103,7 +99,7 @@ static_assert(std::is_trivially_destructible<GlobalConfigEnvInt32>::value,
               "GlobalConfigEnvInt32 needs to be trivially destructible.");
 
 int32_t GlobalConfigEnvInt32::Get() {
-  UniquePtr<char> str = GetValue();
+  grpc_core::UniquePtr<char> str = GetValue();
   if (str == nullptr) {
     return default_value_;
   }
@@ -126,10 +122,10 @@ void GlobalConfigEnvInt32::Set(int32_t value) {
 static_assert(std::is_trivially_destructible<GlobalConfigEnvString>::value,
               "GlobalConfigEnvString needs to be trivially destructible.");
 
-UniquePtr<char> GlobalConfigEnvString::Get() {
-  UniquePtr<char> str = GetValue();
+grpc_core::UniquePtr<char> GlobalConfigEnvString::Get() {
+  grpc_core::UniquePtr<char> str = GetValue();
   if (str == nullptr) {
-    return UniquePtr<char>(gpr_strdup(default_value_));
+    return grpc_core::UniquePtr<char>(gpr_strdup(default_value_));
   }
   return str;
 }

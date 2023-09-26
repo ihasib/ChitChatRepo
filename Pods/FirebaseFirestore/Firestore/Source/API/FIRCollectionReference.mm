@@ -31,13 +31,11 @@
 #include "Firestore/core/src/util/exception.h"
 #include "Firestore/core/src/util/string_apple.h"
 
+namespace util = firebase::firestore::util;
 using firebase::firestore::api::CollectionReference;
 using firebase::firestore::api::DocumentReference;
 using firebase::firestore::core::ParsedSetData;
 using firebase::firestore::model::ResourcePath;
-using firebase::firestore::util::MakeCallback;
-using firebase::firestore::util::MakeNSString;
-using firebase::firestore::util::MakeString;
 using firebase::firestore::util::ThrowInvalidArgument;
 
 NS_ASSUME_NONNULL_BEGIN
@@ -87,7 +85,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 
 - (NSString *)collectionID {
-  return MakeNSString(self.reference.collection_id());
+  return util::MakeNSString(self.reference.collection_id());
 }
 
 - (FIRDocumentReference *_Nullable)parent {
@@ -99,7 +97,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 
 - (NSString *)path {
-  return MakeNSString(self.reference.path());
+  return util::MakeNSString(self.reference.path());
 }
 
 - (FIRDocumentReference *)documentWithPath:(NSString *)documentPath {
@@ -109,7 +107,7 @@ NS_ASSUME_NONNULL_BEGIN
   if (!documentPath.length) {
     ThrowInvalidArgument("Document path cannot be empty.");
   }
-  DocumentReference child = self.reference.Document(MakeString(documentPath));
+  DocumentReference child = self.reference.Document(util::MakeString(documentPath));
   return [[FIRDocumentReference alloc] initWithReference:std::move(child)];
 }
 
@@ -122,7 +120,7 @@ NS_ASSUME_NONNULL_BEGIN
                                        (nullable void (^)(NSError *_Nullable error))completion {
   ParsedSetData parsed = [self.firestore.dataReader parsedSetData:data];
   DocumentReference docRef =
-      self.reference.AddDocument(std::move(parsed), MakeCallback(completion));
+      self.reference.AddDocument(std::move(parsed), util::MakeCallback(completion));
   return [[FIRDocumentReference alloc] initWithReference:std::move(docRef)];
 }
 

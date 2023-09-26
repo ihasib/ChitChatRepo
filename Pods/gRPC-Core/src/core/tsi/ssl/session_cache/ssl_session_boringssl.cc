@@ -22,8 +22,6 @@
 
 #ifdef OPENSSL_IS_BORINGSSL
 
-#include "absl/memory/memory.h"
-
 // BoringSSL allows SSL_SESSION to outlive SSL and SSL_CTX objects which are
 // re-created by gRPC on every certificate rotation or subchannel creation.
 // BoringSSL guarantees that SSL_SESSION is immutable so it's safe to share
@@ -34,7 +32,7 @@ namespace {
 
 class BoringSslCachedSession : public SslCachedSession {
  public:
-  explicit BoringSslCachedSession(SslSessionPtr session)
+  BoringSslCachedSession(SslSessionPtr session)
       : session_(std::move(session)) {}
 
   SslSessionPtr CopySession() const override {

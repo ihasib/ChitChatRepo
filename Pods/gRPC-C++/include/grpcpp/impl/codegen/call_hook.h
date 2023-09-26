@@ -19,9 +19,21 @@
 #ifndef GRPCPP_IMPL_CODEGEN_CALL_HOOK_H
 #define GRPCPP_IMPL_CODEGEN_CALL_HOOK_H
 
-// IWYU pragma: private
+namespace grpc {
 
-/// TODO(chengyuc): Remove this file after solving compatibility.
-#include <grpcpp/impl/call_hook.h>
+namespace internal {
+class CallOpSetInterface;
+class Call;
+
+/// This is an interface that Channel and Server implement to allow them to hook
+/// performing ops.
+class CallHook {
+ public:
+  virtual ~CallHook() {}
+  virtual void PerformOpsOnCall(CallOpSetInterface* ops, Call* call) = 0;
+};
+}  // namespace internal
+
+}  // namespace grpc
 
 #endif  // GRPCPP_IMPL_CODEGEN_CALL_HOOK_H
