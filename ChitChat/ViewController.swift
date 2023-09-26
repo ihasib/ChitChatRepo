@@ -38,6 +38,8 @@ class ViewController: UIViewController {
     //state variable
     var isLogin = true
 
+    var keyboardHideCalled = true
+
     //MARK: View Lifecycle
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -49,7 +51,13 @@ class ViewController: UIViewController {
         NotificationCenter.default.addObserver(
             self,
             selector: #selector(keyboardWillShow),
-            name: UIResponder.keyboardWillChangeFrameNotification,
+            name: UIResponder.keyboardWillShowNotification,
+            object: nil
+        )
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(keyboardWillHide),
+            name: UIResponder.keyboardWillHideNotification,
             object: nil
         )
         emailTextField.delegate = self
@@ -80,34 +88,28 @@ class ViewController: UIViewController {
                 self.dismiss(animated: true)
             }
             print("Email field required")
+            return
         }
+
+        
     }
     
     @IBAction func loginButtonTapped(_ sender: Any) {
         let isFilled = isInputFilledUp(for: isLogin ? .login : .signup)
         if !isFilled {
-            let alert = UIAlertController(title: "Alert", message: "All fields required", preferredStyle: .alert)
-            self.present(alert, animated: true) {
-                sleep(1)
-                self.dismiss(animated: true)
-            }
-            print("All fields required")
+            showToast(msg: "All fields are required", contextVc: self)
             return
         }
         if !isLogin {//signup
             if passwordTextField.text != repeatPasswordTextField.text {
-                let alert = UIAlertController(title: "Alert", message: "Password Missmatched", preferredStyle: .alert)
-                self.present(alert, animated: true) {
-                    sleep(1)
-                    self.dismiss(animated: true)
-                }
-                print("Password Missmatched")
+                showToast(msg: "Password Mismatched", contextVc: self)
                 return
             }
+            registerUser()
         }
 
-        registerUser()
-        goToHomeView()
+        loginUser()
+//        goToHomeView()
     }
     
     @IBAction func signupButtonTapped(_ sender: UIButton) {
@@ -142,10 +144,6 @@ class ViewController: UIViewController {
     }
 
     func setupUiForAccountState(for login: Bool) {
-        print("+++ \(login)")
-        print(loginLabel.text)
-        print(dontHavAccLabel.text)
-        print(signupButton.titleLabel?.text)
         loginLabel.text = login ? "Login" : "Sign Up"
         loginButton.setImage(UIImage(named: login ? "loginBtn" : "registerBtn"), for: .normal)
         dontHavAccLabel.text = login ? "Don't have an account?" : "Have an account?"
@@ -159,7 +157,19 @@ class ViewController: UIViewController {
     }
     
     private func loginUser() {
-        FUserListener.shared
+        FUserListener.shared.loginUser(email: emailTextField.text!, password: passwordTextField.text!) { error, isEmailVerified in
+            if let error = error {
+                showToast(msg: "login failed with \(error.localizedDescription)", contextVc: self)
+                return
+            }
+
+            if !isEmailVerified {
+                showToast(msg: "Email not still verified", contextVc: self)
+                self.resendMailButton.isHidden = false
+            }
+
+            print("User has logged in with email ",User.currentUser?.email)
+        }
     }
 
     private func registerUser() {
@@ -168,7 +178,7 @@ class ViewController: UIViewController {
                 print("Verification email sent")
                 self.resendMailButton.isHidden = false
             } else {
-                print("Registration failed due to \(error?.localizedDescription)")
+                showToast(msg: "Registration failed due to \(error?.localizedDescription)", contextVc: self)
             }
 
         }
@@ -176,6 +186,10 @@ class ViewController: UIViewController {
 
     var jump = 0.0
     @objc func keyboardWillShow(_ notification: Notification) {
+        if !keyboardHideCalled {
+            return
+        }
+        print("keyboardWillShow")
         if let keyboardFrame: NSValue = notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? NSValue {
             let keyboardRectangle = keyboardFrame.cgRectValue
 //            let keyboardHeight = keyboardRectangle.height
@@ -194,8 +208,15 @@ class ViewController: UIViewController {
                 jump = (keyboardRectangle.origin.y-repeatPassSeparatorView.frame.origin.y)// + autoSuggesstionKeyboardHeight//314-231 + height
                 self.view.frame.origin.y -= jump
             }
-
+            keyboardHideCalled = false
         }
+    }
+
+    @objc func keyboardWillHide(_ notification: Notification) {
+        print("keyboardWillHide")
+        keyboardHideCalled = true
+        self.view.frame.origin.y += self.jump
+        jump = 0
     }
 
     func backgroundTapSetup() {
@@ -229,6 +250,7 @@ class ViewController: UIViewController {
 
 extension ViewController: UITextFieldDelegate {
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
+        print("Field delegate called")
         UIView.animate(withDuration: 0.5) {
         textField.resignFirstResponder()
             self.view.frame.origin.y += self.jump
@@ -236,5 +258,13 @@ extension ViewController: UITextFieldDelegate {
         
         jump = 0
         return true
+    }
+}
+
+func showToast(msg: String, contextVc: UIViewController) {
+    let alert = UIAlertController(title: "Alert", message: msg, preferredStyle: .alert)
+    contextVc.present(alert, animated: true) {
+        sleep(1)
+        contextVc.dismiss(animated: true)
     }
 }

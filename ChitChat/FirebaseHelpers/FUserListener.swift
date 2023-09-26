@@ -12,8 +12,6 @@ class FUserListener {
     static let shared = FUserListener()
     private init() {}
 
-    //MARK: Login
-
 
     //MARK: Register
     func registerUser(email: String, password: String, completion: @escaping ( (Error?) -> Void) ) {
@@ -34,16 +32,32 @@ class FUserListener {
         }
     }
 
-    //MARK: LOGIN
+    //MARK: Login
     func loginUser(email: String, password: String, completion: @escaping (Error?, Bool) -> Void?) {
         Auth.auth().signIn(withEmail: email, password: password) { (authDataResult, error) in
             if error == nil && authDataResult!.user.isEmailVerified {
                 print("Login successful")
+                FUserListener.shared.getUserFromFirebase(userId: authDataResult!.user.uid)
                 completion(error,true)
                 return
             }
             print("Login Failed")
             completion(error, false)
+        }
+    }
+
+    //MARK: - Resend mail & Pass
+    func resendVerificationMail(email: String, completion: @escaping (Error?) -> Void) {
+        Auth.auth().currentUser?.reload { error in
+            Auth.auth().currentUser?.sendEmailVerification { error in
+                completion(error)
+            }
+        }
+    }
+
+    func resetPassword(email: String, completion: @escaping (Error?)->Void) {
+        Auth.auth().sendPasswordReset(withEmail: email) { error in
+           completion(error)
         }
     }
 
@@ -59,6 +73,34 @@ class FUserListener {
     }
 
     func getUserFromFirebase(userId: String, email: String? = nil) {
-        
+        let users = firebaseReference(collectionReference: .user).document(userId).getDocument() { docSnapshot, error in
+            guard let docSnapshot = docSnapshot else {
+                print("no user found")
+                return
+            }
+
+            let result = Result {
+                try? docSnapshot.data()
+            }
+
+            switch result {
+                case .success(let userObject):
+                    print("user = \(userObject)")
+                    if let user = userObject {
+                        if let userData = try? JSONSerialization.data(withJSONObject: user) {
+                            if let userDic = try? JSONDecoder().decode(User.self, from: userData) {
+                                print("user = \(userDic)")
+                                saveUserLocally(user: userDic)
+                            }
+                        }
+                    }
+                case .failure(let error):
+                    print("user data fetch failed \(error.localizedDescription)")
+            }
+        }
+    }
+
+    func requestEmailVerification(withEmail email: String) {
+        Auth.auth().currentUser
     }
 }
