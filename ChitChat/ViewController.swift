@@ -180,7 +180,8 @@ class ViewController: UIViewController {
             }
 
             print("User has logged in with email ",User.currentUser?.email)
-            showToast(msg: "Log in successful", contextVc: self)
+//            showToast(msg: "Log in successful", contextVc: self)
+            self.goToHomeView()
             return nil
         }
     }
@@ -191,6 +192,7 @@ class ViewController: UIViewController {
                 print("Verification email sent")
                 showToast(msg: "Registration successful and Verification email sent", contextVc: self)
                 self.resendMailButton.isHidden = false
+                self.setupUiForAccountState(for: true)
             } else {
                 showToast(msg: "Registration failed due to \(error?.localizedDescription)", contextVc: self)
             }
@@ -255,10 +257,13 @@ class ViewController: UIViewController {
     }
 
     //Navigation
+
     private func goToHomeView() {
-        let homeView = UIStoryboard(name: "Main", bundle: nil).instantiateViewController(identifier: "HomeView") as UITabBarController
-        homeView.modalPresentationStyle = .fullScreen
-        present(homeView, animated: true)
+        DispatchQueue.main.async {
+            let homeView = UIStoryboard(name: "Main", bundle: nil).instantiateViewController(identifier: "HomeView") as UITabBarController
+            homeView.modalPresentationStyle = .fullScreen
+            self.present(homeView, animated: true)
+        }
     }
 }
 
@@ -276,9 +281,11 @@ extension ViewController: UITextFieldDelegate {
 }
 
 func showToast(msg: String, contextVc: UIViewController) {
-    let alert = UIAlertController(title: "Alert", message: msg, preferredStyle: .alert)
-    contextVc.present(alert, animated: true) {
-        sleep(1)
-        contextVc.dismiss(animated: true)
+    DispatchQueue.main.async {
+        let alert = UIAlertController(title: "Alert", message: msg, preferredStyle: .alert)
+        contextVc.present(alert, animated: true) {
+            sleep(1)
+            contextVc.dismiss(animated: true)
+        }
     }
 }
