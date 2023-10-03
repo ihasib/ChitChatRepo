@@ -34,6 +34,7 @@ class ViewController: UIViewController {
     @IBOutlet weak var loginButton: UIButton!
     @IBOutlet weak var signupButton: UIButton!
     @IBOutlet weak var resendMailButton: UIButton!
+    @IBOutlet weak var forgotPassButton: UIButton!
     
     //state variable
     var isLogin = true
@@ -76,6 +77,14 @@ class ViewController: UIViewController {
                 self.dismiss(animated: true)
             }
             print("Email field required")
+            return
+        }
+        FUserListener.shared.resetPassword(email: emailTextField.text!) { error in
+            if let error = error {
+                showToast(msg: "password reset failed \(error.localizedDescription)", contextVc: self)
+                return
+            }
+            showToast(msg: "Password reset link sent to mail", contextVc: self)
         }
     }
 
@@ -117,6 +126,7 @@ class ViewController: UIViewController {
         setupUiForAccountState(for: sender.titleLabel?.text == "Login")
     }
 
+
     //MARK:
     func setupTextFieldDelegates() {
         emailTextField.addTarget(self, action: #selector(emailUpdated), for: .editingChanged)
@@ -153,6 +163,7 @@ class ViewController: UIViewController {
             self.repeatPasswordLabel.isHidden = login
             self.repeatPasswordTextField.isHidden = login
             self.repeatPassSeparatorView.isHidden = login
+            self.forgotPassButton.isHidden = !login
         }
     }
     
@@ -169,6 +180,7 @@ class ViewController: UIViewController {
             }
 
             print("User has logged in with email ",User.currentUser?.email)
+            showToast(msg: "Log in successful", contextVc: self)
             return nil
         }
     }
@@ -177,6 +189,7 @@ class ViewController: UIViewController {
         FUserListener.shared.registerUser(email: emailTextField.text!, password: passwordTextField.text!) {error in
             if error == nil {
                 print("Verification email sent")
+                showToast(msg: "Registration successful and Verification email sent", contextVc: self)
                 self.resendMailButton.isHidden = false
             } else {
                 showToast(msg: "Registration failed due to \(error?.localizedDescription)", contextVc: self)
