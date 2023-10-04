@@ -24,7 +24,7 @@ struct User: Codable {
 
     static var currentUser: User? {
         if let curUser = Auth.auth().currentUser {
-            if let jsonDic = UserDefaults.standard.data(forKey: kCurrentUser) {
+            if let jsonDic = UserDefaults.standard.data(forKey: kCurrentUser) {//fetch previously locally saved one
                 let decoder = JSONDecoder()
                 do {
                     let user = try decoder.decode(User.self, from: jsonDic)

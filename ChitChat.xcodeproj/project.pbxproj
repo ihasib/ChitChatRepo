@@ -10,6 +10,7 @@
 		5B6D047B2ABD2D2B00DFBEAD /* User.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B6D047A2ABD2D2B00DFBEAD /* User.swift */; };
 		5B6D047E2ABD3DB800DFBEAD /* FCollectionReference.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B6D047D2ABD3DB800DFBEAD /* FCollectionReference.swift */; };
 		5B6D04802ABD3F9100DFBEAD /* FUserListener.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B6D047F2ABD3F9100DFBEAD /* FUserListener.swift */; };
+		5BCD32492ACD882400F7607B /* SettingsTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BCD32482ACD882400F7607B /* SettingsTableViewController.swift */; };
 		640999432ABA00AF00CFFCDA /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 640999422ABA00AF00CFFCDA /* AppDelegate.swift */; };
 		640999452ABA00AF00CFFCDA /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 640999442ABA00AF00CFFCDA /* SceneDelegate.swift */; };
 		640999472ABA00AF00CFFCDA /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 640999462ABA00AF00CFFCDA /* ViewController.swift */; };
@@ -26,6 +27,7 @@
 		5B6D047A2ABD2D2B00DFBEAD /* User.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = User.swift; sourceTree = "<group>"; };
 		5B6D047D2ABD3DB800DFBEAD /* FCollectionReference.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FCollectionReference.swift; sourceTree = "<group>"; };
 		5B6D047F2ABD3F9100DFBEAD /* FUserListener.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FUserListener.swift; sourceTree = "<group>"; };
+		5BCD32482ACD882400F7607B /* SettingsTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsTableViewController.swift; sourceTree = "<group>"; };
 		6409993F2ABA00AF00CFFCDA /* ChitChat.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ChitChat.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		640999422ABA00AF00CFFCDA /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		640999442ABA00AF00CFFCDA /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -93,6 +95,7 @@
 				640999422ABA00AF00CFFCDA /* AppDelegate.swift */,
 				640999442ABA00AF00CFFCDA /* SceneDelegate.swift */,
 				640999462ABA00AF00CFFCDA /* ViewController.swift */,
+				5BCD32482ACD882400F7607B /* SettingsTableViewController.swift */,
 				640999482ABA00AF00CFFCDA /* Main.storyboard */,
 				6409994B2ABA00B200CFFCDA /* Assets.xcassets */,
 				6409994D2ABA00B200CFFCDA /* LaunchScreen.storyboard */,
@@ -241,6 +244,7 @@
 				5B6D04802ABD3F9100DFBEAD /* FUserListener.swift in Sources */,
 				640999432ABA00AF00CFFCDA /* AppDelegate.swift in Sources */,
 				640999452ABA00AF00CFFCDA /* SceneDelegate.swift in Sources */,
+				5BCD32492ACD882400F7607B /* SettingsTableViewController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

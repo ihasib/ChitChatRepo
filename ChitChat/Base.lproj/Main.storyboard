@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="21701" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="1aM-ns-2XN">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="22154" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="1aM-ns-2XN">
     <device id="retina6_1" orientation="portrait" appearance="light"/>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="21678"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="22130"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="System colors in document resources" minToolsVersion="11.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
@@ -12,7 +12,7 @@
         <!--View Controller-->
         <scene sceneID="CfR-x7-Tii">
             <objects>
-                <viewController id="1aM-ns-2XN" customClass="ViewController" customModule="ChitChat" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController storyboardIdentifier="AuthView" id="1aM-ns-2XN" customClass="ViewController" customModule="ChitChat" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="O5m-Yn-c1P">
                         <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -239,7 +239,7 @@
         <!--Settings-->
         <scene sceneID="FDf-jp-QdZ">
             <objects>
-                <tableViewController id="MUB-yt-h08" sceneMemberID="viewController">
+                <tableViewController id="MUB-yt-h08" customClass="SettingsTableViewController" customModule="ChitChat" customModuleProvider="target" sceneMemberID="viewController">
                     <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="static" style="plain" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="-1" estimatedSectionHeaderHeight="-1" sectionFooterHeight="-1" estimatedSectionFooterHeight="-1" id="sKO-jT-e3f">
                         <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -255,7 +255,7 @@
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
                                                 <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="person" catalog="system" translatesAutoresizingMaskIntoConstraints="NO" id="SVG-XT-aMU">
-                                                    <rect key="frame" x="16" y="11.5" width="60" height="57.5"/>
+                                                    <rect key="frame" x="16" y="11" width="60" height="57.5"/>
                                                     <constraints>
                                                         <constraint firstAttribute="height" constant="60" id="ErC-t7-DLy"/>
                                                         <constraint firstAttribute="width" constant="60" id="lIn-IE-So7"/>
@@ -299,6 +299,9 @@
                                                     <rect key="frame" x="10" y="4.5" width="363.5" height="35"/>
                                                     <state key="normal" title="Button"/>
                                                     <buttonConfiguration key="configuration" style="plain" title="Tell a friend"/>
+                                                    <connections>
+                                                        <action selector="tellAFriendButtonTapped:" destination="MUB-yt-h08" eventType="touchUpInside" id="JmZ-WP-64A"/>
+                                                    </connections>
                                                 </button>
                                             </subviews>
                                             <constraints>
@@ -319,6 +322,9 @@
                                                     <rect key="frame" x="10" y="4.5" width="363.5" height="35"/>
                                                     <state key="normal" title="Button"/>
                                                     <buttonConfiguration key="configuration" style="plain" title="Terms and conditions"/>
+                                                    <connections>
+                                                        <action selector="termsAndConditionButtonTapped:" destination="MUB-yt-h08" eventType="touchUpInside" id="bHn-94-I4k"/>
+                                                    </connections>
                                                 </button>
                                             </subviews>
                                             <constraints>
@@ -339,8 +345,8 @@
                                             <rect key="frame" x="0.0" y="0.0" width="383.5" height="43.5"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
-                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="v6h-0N-2vA">
-                                                    <rect key="frame" x="30" y="4.5" width="61" height="34.5"/>
+                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="App Version" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="v6h-0N-2vA">
+                                                    <rect key="frame" x="30" y="4.5" width="136.5" height="34.5"/>
                                                     <fontDescription key="fontDescription" name="Avenir-Book" family="Avenir" pointSize="25"/>
                                                     <nil key="textColor"/>
                                                     <nil key="highlightedColor"/>
@@ -362,7 +368,12 @@
                                                 <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="sgX-nz-ZgY">
                                                     <rect key="frame" x="10" y="4.5" width="394" height="35"/>
                                                     <state key="normal" title="Button"/>
-                                                    <buttonConfiguration key="configuration" style="plain" title="Log Out"/>
+                                                    <buttonConfiguration key="configuration" style="plain" title="Log Out">
+                                                        <color key="baseForegroundColor" systemColor="systemRedColor"/>
+                                                    </buttonConfiguration>
+                                                    <connections>
+                                                        <action selector="logoutButtonTapped:" destination="MUB-yt-h08" eventType="touchUpInside" id="6wq-SM-Yf1"/>
+                                                    </connections>
                                                 </button>
                                             </subviews>
                                             <constraints>
@@ -381,6 +392,12 @@
                         </connections>
                     </tableView>
                     <navigationItem key="navigationItem" title="Settings" id="UC9-MP-dCD"/>
+                    <connections>
+                        <outlet property="appVersionLabel" destination="v6h-0N-2vA" id="Tnp-z3-DQH"/>
+                        <outlet property="userActivityStatusLabel" destination="BGZ-tD-YiK" id="Ie4-tC-dQV"/>
+                        <outlet property="userAvatarImageView" destination="SVG-XT-aMU" id="7nt-Kt-Xp0"/>
+                        <outlet property="userNameLabel" destination="aNr-Lm-id3" id="ktg-Ac-5vD"/>
+                    </connections>
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="IFX-Gg-3jf" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
@@ -447,10 +464,13 @@
         <image name="loginBtn" width="294" height="62"/>
         <image name="message.fill" catalog="system" width="128" height="114"/>
         <image name="person" catalog="system" width="128" height="121"/>
-        <image name="person.2.fill" catalog="system" width="128" height="81"/>
+        <image name="person.2.fill" catalog="system" width="128" height="86"/>
         <image name="quote.bubble" catalog="system" width="128" height="110"/>
         <systemColor name="systemBackgroundColor">
             <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+        </systemColor>
+        <systemColor name="systemRedColor">
+            <color red="1" green="0.23137254901960785" blue="0.18823529411764706" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </systemColor>
     </resources>
 </document>
